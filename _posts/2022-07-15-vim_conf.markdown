@@ -1,3 +1,10 @@
+---
+layout: post
+title:  "Vim config"
+date:   2022-07-14 19:40:56 +0500
+categories: vim
+---
+
 # My vim config and installation script.
 
 ## Install Vim and python linters
