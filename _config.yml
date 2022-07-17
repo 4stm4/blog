@@ -1,14 +1,13 @@
 title: this_is_the_way
-email: your-email@example.com
+email: 4stm4.74rus@gmail.com
 description: >-
 only blog
-baseurl: "" 
-url: "" 
+baseurl: ""
+url: ""
 twitter_username: jekyllrb
 github_username:  jekyll
 
-remote_theme: pages-themes/midnight@v0.2.0
+theme: minima
 plugins:
   - jekyll-feed
-  - jekyll-remote-theme
 
