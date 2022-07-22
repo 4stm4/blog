@@ -1,0 +1,69 @@
+---
+layout: default
+---
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="mdc-typography">
+
+  <header class="mdc-top-app-bar mdc-top-app-bar--fixed page-heading">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <span class="mdc-top-app-bar__title site-title">{{ page.title | escape }}this_is_the_way</span>
+      </section>
+    </div>
+  </header>
+
+  <main class="mdc-top-app-bar--fixed-adjust">
+    <div class="content-body">
+
+      <ul class="post-list">
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        {%- for post in posts -%}
+        <li>
+          <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+              <div class="col p-4 d-flex flex-column position-static">
+                <p class="mb-0">
+                  <a class="h3 text-warning">{{ post.title | escape }}</a>
+                  <a class="h6 text-muted">{{post.date | date: date_format}}</a>
+                </p>
+                <p class="card-text mb-auto"><small>{{ post.description }}</small></p>
+                <a href="{{ post.url | relative_url }}" class="stretched-link"></a>
+              </div>
+              <img src="{{ site.url }}/{{ post.image }}" class="card-img-bottom">
+            </div>
+          </div>
+          {%- if site.show_excerpts -%}
+          {{ post.excerpt }}
+          {%- endif -%}
+        </li>
+        {%- endfor -%}
+      </ul>
+    <div class="mdc-card">
+      <!-- ... content ... -->
+      lkjlkj
+    </div>
+    <div class="mdc-card">
+      <!-- ... content ... -->
+      lkjlkj
+    </div>
+    <div class="mdc-card">
+      <!-- ... content ... -->
+      lklkj
+    </div>
+  </div>
+  </main>
+
+
+  <script type="text/javascript" src="assets/js/index.js"></script>
+  <script type="text/javascript" src="assets/css/style.js"></script>
+</body>
+
+</html>
