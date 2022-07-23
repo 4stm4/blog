@@ -1,0 +1,13 @@
+@font-face {
+    font-family: "Caskaydia Cove";
+    src: url("Caskaydia Cove.ttf");
+}
+
+body {
+    margin-top: 60px;
+    margin-left: 50px;
+    margin-right: 50px;
+    background-color: #1a252c;
+    color: white;
+    font-family: Caskaydia Cove;
+}

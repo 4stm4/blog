@@ -6,32 +6,17 @@
     <link href="//cdn.jsdelivr.net/npm/font-logos@1/assets/font-logos.css" rel="stylesheet">
     <script data-search-pseudo-elements defer src="assets/fontawesome/js/all.js"></script>
     <link href="assets/style.css" rel="stylesheet">
-    <title></title>
+    <title>{{page.title}}</title>
   </head>
   <body>
     <nav class="navbar fixed-top navbar-light" style="background-color: #263540;">
         <div class="container-fluid">
           <span class="icon logo"></span>
           
-          <a class="navbar-brand" href="#">this_is_the_way</a>
+          <a class="navbar-brand" href="#">{{ site.title | escape }}</a>
         </div>
       </nav>
-    <div class="home">
-<h2 class="post-list-heading">Posts</h2>
-    <ul class="post-list"><li><span class="post-meta">Jul 21, 2022</span>
-        <h3>
-          <a class="post-link" href="/jekyll/update/2022/07/21/welcome-to-jekyll.html">
-            Welcome to Jekyll!
-          </a>
-        </h3></li><li><span class="post-meta">Jul 14, 2022</span>
-        <h3>
-          <a class="post-link" href="/vim/2022/07/14/vim_conf.html">
-            Vim config
-          </a>
-        </h3></li></ul>
-
-    <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p></div>
-
+    {{ content }}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
