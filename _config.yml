@@ -21,7 +21,7 @@
 title: this_is_the_way
 email: i@4stm4.ru 
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://localhost:4000/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://4stm4.ru/" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 theme: minima
