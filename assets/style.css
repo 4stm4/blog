@@ -2,31 +2,39 @@
     font-family: "Caskaydia Cove";
     src: url("Caskaydia Cove.ttf");
 }
-
+:root {
+--bg-color: #323437;
+--sub-color: #272727;
+--active-color: #e2b714;
+--select-color: #e58b0e;
+--text-color: #d1d0c5;
+}
 body {
     margin-top: 60px;
     margin-left: 50px;
     margin-right: 50px;
-    background-color: #0d1117;
-    color: antiquewhite;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     font-family: Caskaydia Cove;
 }
 a{
-  color: #aeebed;
+  color: var(--active-color);
   font-family: Caskaydia Cove;
 }
+a:active {
+  color: var(--select-color);
+}
 .list-group-item {
-  background-color: #0d1117;
+  background-color: var(--bg-color);
 }
 .site-title {
-  color: #0d1117;
+  color: var(--bg-color);
   font-weight: bolder;
 }
 .badge{
-  background-color: #161b22;
-  border: #6e7681;
-  border-width: 1px;
+  background-color: var(--sub-color);
+  color: var(--text-color);
 }
 .fixed-top{
-  background-color: #1d242e;
+  background-color: var(--sub-color);
 }

@@ -7,7 +7,7 @@ categories: vim
 
 ##### My vim config and installation script.
 
-###### 1. Install Vim and python linters
+###### Install Vim and python linters
 
 ###### pip install pyflakes pep8 pylint ipython
 
