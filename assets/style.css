@@ -130,6 +130,3 @@ pre {
 .color-fg-success {
   color: var(--select-color) !important;
 }
-.d-none {
-  display: inline-block;
-}
