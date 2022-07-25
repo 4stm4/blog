@@ -1,40 +1,135 @@
 @font-face {
-    font-family: "Caskaydia Cove";
-    src: url("Caskaydia Cove.ttf");
+  font-family: "Caskaydia Cove";
+  src: url("Caskaydia Cove.ttf");
 }
+
 :root {
---bg-color: #323437;
---sub-color: #272727;
---active-color: #e2b714;
---select-color: #e58b0e;
---text-color: #d1d0c5;
+  --bg-color: #323437;
+  --border-color: #3f4347;
+  --border-color-light: #8b949e;
+  --sub-color: #272727;
+  --sub-color-light: #313131;
+  --sub-color-brigth: #404040;
+  --active-color: #e2b714;
+  --select-color: #cb5800;
+  --text-color: #d1d0c5;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
 }
+
 body {
-    margin-top: 60px;
-    margin-left: 50px;
-    margin-right: 50px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: Caskaydia Cove;
-}
-a{
-  color: var(--active-color);
+  margin-top: 60px;
+  margin-left: 50px;
+  margin-right: 50px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   font-family: Caskaydia Cove;
 }
-a:active {
+
+a {
+  color: var(--active-color);
+  font-family: Caskaydia Cove;
+  text-decoration: none;
+}
+
+a:hover {
   color: var(--select-color);
 }
+
 .list-group-item {
   background-color: var(--bg-color);
 }
+
 .site-title {
   color: var(--bg-color);
   font-weight: bolder;
 }
-.badge{
+
+.badge {
   background-color: var(--sub-color);
   color: var(--text-color);
 }
-.fixed-top{
+
+.fixed-top {
   background-color: var(--sub-color);
+}
+
+pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: var(--sub-color);
+  border-radius: 6px;
+  border: 1px;
+  border-style: solid;
+  border-color: var(--border-color);
+  font-family: Caskaydia Cove;
+}
+/* --- */
+.snippet-clipboard-content {
+  animation: fade-out 200ms both;
+  display: block;
+  position: relative !important;
+}
+
+.snippet-clipboard-content:hover .zeroclipboard-container{
+  display: block;
+}
+
+.zeroclipboard-container{
+  display: none;
+}
+
+
+/* .ClipboardButton {
+  position: relative;
+} */
+.p-0 {
+  padding: 0 !important;
+}
+.m-2 {
+  margin: 8px !important;
+}
+.btn {
+  color: var(--color-btn-text);
+  background-color: var(--sub-color-light);
+  border-color: var(--border-color);
+  /* box-shadow: var(--color-btn-shadow),var(--color-btn-inset-shadow); */
+  /* transition: 80ms cubic-bezier(0.33, 1, 0.68, 1); 
+  transition-property: color,background-color,box-shadow,border-color; */
+}
+
+.octicon {
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.btn .octicon {
+  margin-right: 4px;
+  color: var(--border-color-light);
+  vertical-align: text-bottom;
+}
+.btn:hover{
+  background-color: var(--sub-color-brigth);
+  border-color: var(--border-color-light);
+}
+
+.right-0 {
+  right: 0 !important;
+}
+
+.top-0 {
+  top: 0 !important;
+}
+.position-absolute {
+  position: absolute !important;
+}
+.color-fg-success {
+  color: var(--select-color) !important;
+}
+.d-none {
+  display: inline-block;
 }
