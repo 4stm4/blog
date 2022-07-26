@@ -5,7 +5,8 @@
 
 :root {
   --bg-color: #323437;
-  --border-color: #3f4347;
+  --bg-color-light: #45484c;
+  --border-color: #4f5459;
   --border-color-light: #8b949e;
   --sub-color: #272727;
   --sub-color-light: #313131;
@@ -34,6 +35,11 @@ a {
 
 a:hover {
   color: var(--select-color);
+}
+
+blockquote {
+  background-color: var(--bg-color-light);
+  padding: 3 px, 3px, 2px , 1px;
 }
 
 .list-group-item {
@@ -82,9 +88,6 @@ pre {
 }
 
 
-/* .ClipboardButton {
-  position: relative;
-} */
 .p-0 {
   padding: 0 !important;
 }
@@ -95,9 +98,6 @@ pre {
   color: var(--color-btn-text);
   background-color: var(--sub-color-light);
   border-color: var(--border-color);
-  /* box-shadow: var(--color-btn-shadow),var(--color-btn-inset-shadow); */
-  /* transition: 80ms cubic-bezier(0.33, 1, 0.68, 1); 
-  transition-property: color,background-color,box-shadow,border-color; */
 }
 
 .octicon {
