@@ -59,3 +59,31 @@ categories: python
 > 1    1.002    1.002    1.002    1.002 {built-in method time.sleep} \
 > 1    0.000    0.000    1.003    1.003 {built-in method builtins.exec} \
 > 1    0.000    0.000    1.002    1.002 <string>:1(<module>)
+
+---
+#### using pysnooper
+
+##### installation
+
+```cmd
+    pip3 install pysnooper
+ ```
+
+##### example
+
+```python
+import pysnooper
+
+@pysnooper.snoop()
+def test(number: int):
+    sum = 0
+    for i in range(number):
+        sum += i
+    return sum
+
+if __name__ == '__main__':
+    test(1) 
+ ```
+##### Output:
+
+<img src="{{site.url}}/assets/jpeg/pysnooper.jpeg" width="600px">

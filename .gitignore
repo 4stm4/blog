@@ -5,3 +5,6 @@ _site
 vendor
 node_modules
 _config.yml
+__pycache__
+__pycache__/code.cpython-39.pyc
+.DS_Store

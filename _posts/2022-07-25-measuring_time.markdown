@@ -34,6 +34,7 @@ categories: python
 ```
 
 ###### output:
+
 >  time= 3.010448098
 
 ###### `number` parameter using to repeat code
