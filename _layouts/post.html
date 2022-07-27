@@ -2,16 +2,17 @@
 layout: default
 ---
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<link href="{{site.url}}/assets/highlight.css" rel="stylesheet">
 <body>
 
-  {{ page.title | escape }}
-  <br>
+<br>
+<br>
   {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
 
   {{ page.date | date: date_format }}
-
+<br>
   {{ content }}
+<br>
   <script src="{{site.url}}/assets/js/code.js"></script>
   <script src="{{site.url}}/assets/js/clipboard.js"></script>
   <script src="{{site.url}}/assets/js/clipboard_copy_component.js"></script>

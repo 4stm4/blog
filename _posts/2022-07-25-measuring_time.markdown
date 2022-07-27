@@ -11,6 +11,7 @@ categories: python
 
 ##### using `perf_counter` method
 
+```python
     from time import perf_counter, sleep
 
     if __name__ == '__main__':
@@ -18,18 +19,22 @@ categories: python
         sleep(1)
         duration = perf_counter() - start_time
         print('duration time =', duration)
+```
 
 ###### output:
-> duration time = 1.004974456
+>  duration time = 1.004974456
 
 ##### 2) using `timeit` method
 
+```python
     from timeit import timeit
 
     if __name__ == '__main__':
         print('duration time =', timeit('sleep(1)', 'from time import sleep', number=3))
+```
 
 ###### output:
 >  time= 3.010448098
 
-##### `number` parameter using to repeat code
+###### `number` parameter using to repeat code
+---
