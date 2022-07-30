@@ -37,11 +37,6 @@ a:hover {
   color: var(--select-color);
 }
 
-blockquote {
-  background-color: var(--bg-color-light);
-  padding: 3 px, 3px, 2px , 1px;
-}
-
 .list-group-item {
   background-color: var(--bg-color);
 }
@@ -62,6 +57,7 @@ blockquote {
 
 pre {
   padding: 16px;
+  margin: 0px;
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
@@ -74,6 +70,7 @@ pre {
 }
 /* --- */
 .snippet-clipboard-content {
+  margin: 10px 0px 10px 0px;
   animation: fade-out 200ms both;
   display: block;
   position: relative !important;

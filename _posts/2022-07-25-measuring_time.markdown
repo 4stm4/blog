@@ -21,7 +21,6 @@ categories: python
         print('duration time =', duration)
 ```
 
-###### output:
 >  duration time = 1.004974456
 
 ##### 2) using `timeit` method
@@ -32,8 +31,6 @@ categories: python
     if __name__ == '__main__':
         print('duration time =', timeit('sleep(1)', 'from time import sleep', number=3))
 ```
-
-###### output:
 
 >  time= 3.010448098
 

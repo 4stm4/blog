@@ -29,8 +29,6 @@ categories: python
     python -m pstat result.out
 ```
 
-##### Output:
-
 > Welcome to the profile statistics browser. \
 > code.out%
 
@@ -45,8 +43,6 @@ categories: python
 ```cmd
     stats 3
  ```
- 
- ##### Output:
 
 > code.out% stats 3 \
 > Wed Jul 27 08:47:41 2022    code.out
@@ -84,6 +80,5 @@ def test(number: int):
 if __name__ == '__main__':
     test(1) 
  ```
-##### Output:
-
+ 
 <img src="{{site.url}}/assets/jpeg/pysnooper.jpeg" width="600px">

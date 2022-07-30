@@ -1,3 +1,13 @@
+:root {
+    --active-color: #e2b714;
+    --bg-color-light: #45484c;
+    --select-color: #cb5800;
+    --border-color-light: #8b949e;
+    --bg-color: #323437;
+    --sub-color: #272727;
+  }
+  
+
 .language-python .highlight .kn{
     color: rgb(221, 72, 247);
 }
@@ -16,4 +26,57 @@
 }
 .language-python .highlight .s{
     color: rgb(247, 104, 72);
+}
+
+.language-python {
+    margin: 10px 0px 10px 0px;
+    padding: 0px;
+    font-size: 10px;
+    color: #8b949e;
+    display: block;
+    position: relative !important;
+}
+.python-label {
+    color: var(--bg-color);
+    margin: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: absolute !important;
+    top: 0px;
+    background-color: var(--border-color-light);
+}
+.highlight{
+    font-size: 14px;
+}
+.output-wrap {
+    margin: 10px 0px 10px 0px;
+}
+.output {
+    background-color: var(--sub-color);
+    border-radius: 6px;
+}
+.output-label {
+    font-size: 10px;
+    margin: 0px;
+    padding-left: 15px;
+}
+blockquote {
+    margin: 0px 0px 0px 15px;
+    padding: 5px 5px 5px 15px;
+    background-color: var(--bg-color-light);
+    border-radius: 0px 6px 6px 0px;
+}
+.cmd-wrap {
+    display: block;
+    position: relative !important;
+}
+.cmd-label {
+    color: var(--bg-color);
+    font-size: 10px;
+    margin: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: absolute !important;
+    top: 0px;
+    background-color: var(--border-color-light);
 }

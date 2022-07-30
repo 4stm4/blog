@@ -25,10 +25,18 @@ var clipboard_copy = " \
         </svg>\
     </clipboard-copy> \
 </div>";
+
+var python_logo = "<div class='python-label'>PYTHON CODE</div>";
 $(function () {
     $('pre').wrap('<div class="snippet-clipboard-content"></div>');
+    $('blockquote').wrap('<div class="output"></div>');
+    $('.output').wrap('<div class="output-wrap"></div>');
+    $('.output-wrap').prepend('<div class="output-label">OUTPUT</div>');
+    $('.language-python').append(python_logo);
     $('.snippet-clipboard-content').append(clipboard_copy);
-    $("code").each(function (i) {
+    $('.language-cmd').parent().parent().wrap('<div class="cmd-wrap"></div>');
+    $('.cmd-wrap').append('<div class="cmd-label">CLI COMMAND</div>');
+    $('code').each(function (i) {
         $(this).parent().siblings('.zeroclipboard-container').children('clipboard-copy').attr('value', $(this).text());
     });
 });
