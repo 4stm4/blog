@@ -31,7 +31,7 @@ $(function () {
     $('pre').wrap('<div class="snippet-clipboard-content"></div>');
     $('blockquote').wrap('<div class="output"></div>');
     $('.output').wrap('<div class="output-wrap"></div>');
-    $('.output-wrap').prepend('<div class="output-label">OUTPUT</div>');
+    $('.output-wrap').append('<div class="output-label">OUTPUT</div>');
     $('.language-python').append(python_logo);
     $('.snippet-clipboard-content').append(clipboard_copy);
     $('.language-cmd').parent().parent().wrap('<div class="cmd-wrap"></div>');

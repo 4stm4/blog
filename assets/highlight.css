@@ -50,6 +50,8 @@
 }
 .output-wrap {
     margin: 10px 0px 10px 0px;
+    display: block;
+    position: relative !important;
 }
 .output {
     background-color: var(--sub-color);
@@ -58,10 +60,15 @@
 .output-label {
     font-size: 10px;
     margin: 0px;
-    padding-left: 15px;
+    padding-left: 3px;
+    text-orientation: upright;
+    writing-mode: vertical-lr; 
+    top: 0px;
+    left: 0px;
+    position: absolute !important;
 }
 blockquote {
-    margin: 0px 0px 0px 15px;
+    margin: 0px 0px 0px 20px;
     padding: 5px 5px 5px 15px;
     background-color: var(--bg-color-light);
     border-radius: 0px 6px 6px 0px;
@@ -80,3 +87,9 @@ blockquote {
     top: 0px;
     background-color: var(--border-color-light);
 }
+li::marker {
+    color: var(--select-color);
+    background-color: pink;
+    font-weight: 900;
+    font-size: large;
+  }
