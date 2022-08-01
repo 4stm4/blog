@@ -36,6 +36,8 @@ $(function () {
     $('.snippet-clipboard-content').append(clipboard_copy);
     $('.language-cmd').parent().parent().wrap('<div class="cmd-wrap"></div>');
     $('.cmd-wrap').append('<div class="cmd-label">CLI COMMAND</div>');
+    $('img').wrap('<div class="img-wrap"></div>>');
+    $('.img-wrap').append('<div class="img-label">IMAGE</div>');
     $('code').each(function (i) {
         $(this).parent().siblings('.zeroclipboard-container').children('clipboard-copy').attr('value', $(this).text());
     });
