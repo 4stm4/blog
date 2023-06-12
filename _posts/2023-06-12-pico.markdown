@@ -10,15 +10,27 @@ categories: asm
 ---
 ###### Подключение лучше всего производить к Raspberry Pi 3, 4 на OS Raspbian.
 1) Припаять пины и разьем Serial Wire Debug (SWD).
-2) Подключить Pico RPI3, 4
+2) Подключить Pico к RPI3, 4.
 
 |Raspberry Pi   |Raspberry Pi Pico|
-|---------------|-----------------|
-|GND (Pin 20)   |SWD GND|
-|GPIO24 (Pin 18)| SWDIO|
-|GPIO25 (Pin 22)| SWCLK|
+|:--------------|----------------:|
+|GND (Pin 20)   |   SWD GND|
+|GPIO24 (Pin 18)|   SWDIO|
+|GPIO25 (Pin 22)|   SWCLK|
 
 <img src="{{site.url}}/assets/jpeg/SWD_connection.png" width="600px">
+3) Скачиваем скрипт установки ПО с официально сайта.
+  ```cmd
+      wget https://raw.githubusercontent.com/raspberrypi/pico-setup/master/pico_setup.sh
+  ```
+4) Делаем скрипт запускаемым.
+  ```cmd
+      chmod +x pico_setup.sh
+ ```
+5) Запускаем скрипт.
+ ```cmd
+      ./pico_setup.sh
+ ```
 
 ##### Официальная документация
 ---
@@ -48,4 +60,4 @@ categories: asm
   ```cmd
       sudo vim /boot/cmdline.txt
   ```
-###### Добавить строку: 'fbcon=rotate:2' (цифра означает количество поворотов)
+###### Добавить строку: 'fbcon=rotate:2' (цифра означает количество поворотов экрана)
