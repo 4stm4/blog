@@ -34,13 +34,13 @@ categories: asm
 
 ###### Устанавливается ПО:
 
-  ###### Pico SDK
-  ###### OpenOCD (Open On-Chip Debugg) homepage: https://openocd.org/
-  ###### gdb-multiarch homepage: https://www.sourceware.org/gdb/
-  ###### GCC homepage: https://gcc.gnu.org/
-  ###### VSCode + plugins homepage: https://code.visualstudio.com/
-  ###### Git homepage: https://git-scm.com/
-  ###### minicom homepage: https://salsa.debian.org/minicom-team/minicom
+###### Pico SDK
+###### OpenOCD (Open On-Chip Debugg) homepage: https://openocd.org/
+###### gdb-multiarch homepage: https://www.sourceware.org/gdb/
+###### GCC homepage: https://gcc.gnu.org/
+###### VSCode + plugins homepage: https://code.visualstudio.com/
+###### Git homepage: https://git-scm.com/
+###### minicom homepage: https://salsa.debian.org/minicom-team/minicom
 
 
 ##### Официальная документация
@@ -66,7 +66,7 @@ categories: asm
 19. [Pico W product brief .pdf](https://datasheets.raspberrypi.com/pico/pico-product-brief.pdf)
 
 
-###### Повернуть экран в режимие CLI Raspbian
+###### Повернуть изображение на мониторе в режимие CLI Raspbian
 ---
   ```cmd
       sudo vim /boot/cmdline.txt
