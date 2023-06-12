@@ -1,6 +1,6 @@
 ---
 layout: post
-latle:  "Подключение Raspberry Pi Pico"
+title:  "Подключение Raspberry Pi Pico"
 date:   2023-06-12 9:44:44 +0500
 categories: asm
 ---
@@ -34,13 +34,15 @@ categories: asm
 
 ###### Устанавливается ПО:
 
-  Pico SDK
-  OpenOCD (Open On-Chip Debugg) homepage: https://openocd.org/
-  gdb-multiarch homepage: https://www.sourceware.org/gdb/
-  GCC homepage: https://gcc.gnu.org/
-  VSCode + plugins homepage: https://code.visualstudio.com/
-  Git homepage: https://git-scm.com/
-  minicom homepage: https://salsa.debian.org/minicom-team/minicom
+  ###### Pico SDK
+  ###### OpenOCD (Open On-Chip Debugg) homepage: https://openocd.org/
+  ###### gdb-multiarch homepage: https://www.sourceware.org/gdb/
+  ###### GCC homepage: https://gcc.gnu.org/
+  ###### VSCode + plugins homepage: https://code.visualstudio.com/
+  ###### Git homepage: https://git-scm.com/
+  ###### minicom homepage: https://salsa.debian.org/minicom-team/minicom
+
+
 ##### Официальная документация
 ---
 1.  [RP2040 Datasheet .pdf](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf)
