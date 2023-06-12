@@ -10,13 +10,15 @@ categories: asm
 ---
 ###### Подключение лучше всего производить к Raspberry Pi 3, 4 на OS Raspbian.
 1) Припаять пины и разьем Serial Wire Debug (SWD).
-2) Подключить 
+2) Подключить Pico RPI3, 4
 
-    |Raspberry Pi   |Raspberry Pi Pico|
-    |---------------|-----------------|
-    |GND (Pin 20)   |SWD GND|
-    |GPIO24 (Pin 18)| SWDIO|
-    |GPIO25 (Pin 22)| SWCLK|
+|Raspberry Pi   |Raspberry Pi Pico|
+|---------------|-----------------|
+|GND (Pin 20)   |SWD GND|
+|GPIO24 (Pin 18)| SWDIO|
+|GPIO25 (Pin 22)| SWCLK|
+
+<img src="{{site.url}}/assets/jpeg/SWD_connection.png" width="600px">
 
 ##### Официальная документация
 ---
