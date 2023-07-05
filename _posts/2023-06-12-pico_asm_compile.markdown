@@ -8,8 +8,7 @@ categories: asm
 
 ##### Pico: компиляция проекта на asm
 ---
-
-
+###### продолжение следует ...
 ---
   ```cmd
     rm -rf build
@@ -33,7 +32,6 @@ categories: asm
   ```cmd
     minicom -b 115200 -o -D /dev/ttyACM0
   ```
-minicom -b 115200 -o -D /dev/ttyACM0
 5) Для debug сборки скрипт  cmaked.
   ```cmd
     cmake -DCMAKE_BUILD_TYPE=Debug ..
