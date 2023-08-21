@@ -35,12 +35,12 @@ categories: asm
 ###### Устанавливается ПО:
 
 ###### Pico SDK
-###### OpenOCD (Open On-Chip Debugg) homepage: https://openocd.org/
-###### gdb-multiarch homepage: https://www.sourceware.org/gdb/
-###### GCC homepage: https://gcc.gnu.org/
-###### VSCode + plugins homepage: https://code.visualstudio.com/
-###### Git homepage: https://git-scm.com/
-###### minicom homepage: https://salsa.debian.org/minicom-team/minicom
+###### OpenOCD (Open On-Chip Debugg), homepage: https://openocd.org/
+###### gdb-multiarch, homepage: https://www.sourceware.org/gdb/
+###### GCC, homepage: https://gcc.gnu.org/
+###### VSCode + plugins, homepage: https://code.visualstudio.com/
+###### Git, homepage: https://git-scm.com/
+###### minicom, homepage: https://salsa.debian.org/minicom-team/minicom
 
 
 ##### Официальная документация
@@ -71,4 +71,12 @@ categories: asm
   ```cmd
       sudo vim /boot/cmdline.txt
   ```
+###### Повернуть изображение на мониторе при использовнании Raspbian lite
+  ```cmd
+      sudo vim /boot/config.txt
+  ```
+
 ###### Добавить строку: 'fbcon=rotate:2' (цифра означает количество поворотов экрана)
+
+###### Закоментировать строку dtoverlay=vc4-fkms-v3d
+###### Добавить строку adding 'display_hdmi_rotate=2' 
