@@ -18,64 +18,64 @@ categories: vim
 
 ### 1) upload vim-plug
 
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        curl -fLo ~/.vim/autoload/plug.vim --create-dirs \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 
 ###### 2) add folder for plugins
 
-mkdir ~/.vim/plugged
+        mkdir ~/.vim/plugged
 
 ###### 3) change vim config
 
-vim ~/.vimrc
+        vim ~/.vimrc
 
 ###### 4) add lines for creating plugin section in config file
 
-" plugins section
-call plug#begin('~/.vim/plugged')
+        " plugins section
+        call plug#begin('~/.vim/plugged')
 
-call plug#end()
+        call plug#end()
 
-" config section
+        " config section
 
 #### Color sheme https://github.com/tomasiser/vim-code-dark
 ---
 
 ###### 1) change vim config
 
-nano ~/.vimrc
+        nano ~/.vimrc
 
 ###### 2) add line to plug section
 
-Plug 'tomasiser/vim-code-dark'
+        Plug 'tomasiser/vim-code-dark'
 
 ###### 3) isntall plugin
 
-vim -c 'PlugInstall'
+        vim -c 'PlugInstall'
 
 ###### 4) add line to config section
 
-colorscheme codedark
+        colorscheme codedark
 
 ###### 5) If you have vim-airline, you can also enable the provided theme
 
-let g:airline_theme = 'codedark'
+        let g:airline_theme = 'codedark'
 
 #### Vim airline https://github.com/vim-airline/vim-airline
 ---
 
 ###### 1) change vim config
 
-vim ~/.vimrc
+        vim ~/.vimrc
 
 ###### 2) add lines to plug section
 
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+        Plug 'vim-airline/vim-airline'
+        Plug 'vim-airline/vim-airline-themes'
  
 ###### 3) isntall plugin
 
-vim -c 'PlugInstall'
+        vim -c 'PlugInstall'
  
 ###### 4) Add airline config
  
