@@ -71,12 +71,13 @@ categories: asm
   ```cmd
       sudo vim /boot/cmdline.txt
   ```
+
+###### Добавить строку: 'fbcon=rotate:2' (цифра означает количество поворотов экрана)
+
 ###### Повернуть изображение на мониторе при использовнании Raspbian lite
   ```cmd
       sudo vim /boot/config.txt
   ```
-
-###### Добавить строку: 'fbcon=rotate:2' (цифра означает количество поворотов экрана)
 
 ###### Закоментировать строку dtoverlay=vc4-fkms-v3d
 ###### Добавить строку adding 'display_hdmi_rotate=3' 
