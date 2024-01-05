@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Подключение Raspberry Pi Pico"
-date:   2023-06-12 16:44:44 +0500
+title:  "Настройка powerline в bash и tmux"
+date:   2024-01-04 16:44:44 +0500
 categories: asm
 ---
 <BR>
