@@ -32,3 +32,4 @@ group :jekyll_plugins do
   gem 'jekyll-commonmark-ghpages'
 end
 gem "molinillo", "~> 0.8.0"
+gem 'jekyll-seo-tag'
