@@ -27,6 +27,7 @@ url: "https://4stm4.ru/" # the base hostname & protocol for your site, e.g. http
 theme: minima
 plugins:
     - jekyll-seo-tag
+    - jekyll-sitemap
 # plugins:
 #   - jekyll-feed
 
