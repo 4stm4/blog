@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Введенеие в IPS/IDS/snort"
+title:  "Введение в IPS/IDS/snort"
 date:   2024-02-15 21:21:21 +0500
 categories: snort
 ---
 <BR>
 
-## Введенеие в IPS/IDS/snort
+## Введение в IPS/IDS/snort
 
 **Система обнаружения вторжений ( IDS )**
 
