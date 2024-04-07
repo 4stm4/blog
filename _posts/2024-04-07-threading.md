@@ -8,7 +8,7 @@ categories: python
 
 ## Введение в Threading (python) с примерами
 
-****Поток*** (Thread) - это наименьшая единица исполнения в рамках процесса операционной системы. Поток выполняет инструкции программы, представляет собой последовательность команд, которые процессор может выполнить параллельно с другими потоками в рамках одного процесса.
+***Поток** (Thread) - это наименьшая единица исполнения в рамках процесса операционной системы. Поток выполняет инструкции программы, представляет собой последовательность команд, которые процессор может выполнить параллельно с другими потоками в рамках одного процесса.
 
 Важные характеристики потоков:
 1. **Принадлежат процессу:** Потоки существуют в рамках процесса и разделяют ресурсы этого процесса, такие как память, файловые дескрипторы и другие системные ресурсы.
@@ -129,11 +129,17 @@ def worker(barrier):
 
 # Создание объекта Barrier для четырех потоков
 barrier = threading.Barrier(4) 
+
 # Создание и запуск потоков
-thread1 = threading.Thread(target=worker, args=(barrier,), name='Thread 1') thread2 = threading.Thread(target=worker, args=(barrier,), name='Thread 2') thread3 = threading.Thread(target=worker, args=(barrier,), name='Thread 3') thread4 = threading.Thread(target=worker, args=(barrier,), name='Thread 4') thread1.start()
+thread1 = threading.Thread(target=worker, args=(barrier,), name='Thread 1')
+thread2 = threading.Thread(target=worker, args=(barrier,), name='Thread 2')
+thread3 = threading.Thread(target=worker, args=(barrier,), name='Thread 3')
+thread4 = threading.Thread(target=worker, args=(barrier,), name='Thread 4')
+thread1.start()
 thread2.start()
 thread3.start()
 thread4.start()
+
 # Ожидание завершения потоков
 thread1.join()
 thread2.join()
