@@ -8,8 +8,8 @@ categories: python
 
 ## Введение в Multiprocessing (python) с примерами
 
- #### Process
- 
+#### Process
+
  `Process` в модуле `multiprocessing` в Python представляет собой класс, который позволяет создавать отдельные процессы в операционной системе. Каждый экземпляр класса `Process` представляет отдельный процесс в системе, который может выполнять определенную задачу параллельно с другими процессами.
 
 Основные особенности и методы класса `multiprocessing.Process` включают:
@@ -31,16 +31,17 @@ import os
 # Функция, которая будет выполнена в каждом процессе
 def print_info(name):
 	print(f'Процесс {name}, ID процесса: {os.getpid()}')
-	if __name__ == '__main__': # Создание объектов процессов
-		process1 = multiprocessing.Process(target=print_info, args=('Процесс 1',))
-		process2 = multiprocessing.Process(target=print_info, args=('Процесс 2',))
-		# Запуск процессов
-		process1.start()
-		process2.start()
-	
-		# Ожидание завершения процессов
-		process1.join()
-		process2.join()
+
+if __name__ == '__main__': # Создание объектов процессов
+    process1 = multiprocessing.Process(target=print_info, args=('Процесс 1',))
+    process2 = multiprocessing.Process(target=print_info, args=('Процесс 2',))
+    # Запуск процессов
+    process1.start()
+    process2.start()
+
+    # Ожидание завершения процессов
+    process1.join()
+    process2.join()
 ```
 Обратите внимание на ключевую проверку `if __name__ == '__main__':`, которая необходима для избежания проблем при работе с модулем `multiprocessing` на платформах, поддерживающих процессы. После запуска этого кода вы должны увидеть вывод, подобный следующему: 
 ```
@@ -207,9 +208,9 @@ if __name__ == "__main__":
  ```python
  import multiprocessing
 
-	def increment_counter(counter, lock):
-		with lock:
-			counter.value += 1
+def increment_counter(counter, lock):
+    with lock:
+        counter.value += 1
 
 if __name__ == "__main__":
 	manager = multiprocessing.Manager()
