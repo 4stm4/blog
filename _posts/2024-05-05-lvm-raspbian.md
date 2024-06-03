@@ -4,7 +4,7 @@ title:  "LVM на raspberry pi 4: создание логического дис
 date:   2024-05-18 01:01:01 +0500
 categories: lvm
 ---
-<BR>
+
 
 ## LVM на raspberry pi 4: создание логического диска из нескольких дисков
 

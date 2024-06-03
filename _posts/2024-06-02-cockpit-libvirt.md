@@ -1,10 +1,9 @@
 ---
 layout: post
-title:  "Инструкция по установке Cockpit, KVM и Libvirt на Raspberry Pi (Raspbian OS)"
+title:  "Установка Cockpit, KVM и Libvirt на Raspberry Pi (Raspbian OS)"
 date:   2024-06-02 16:16:16 +0500
 categories: raspbian_os
----
-<BR>
+--- 
 
 ## Инструкция по установке Cockpit, KVM и Libvirt на Raspberry Pi (Raspbian OS)
 
