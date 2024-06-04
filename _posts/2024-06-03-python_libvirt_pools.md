@@ -88,8 +88,11 @@ finally:
   <name>mynetfspool</name>
   <source>
     <host name='nfsserver.example.com'/>
-    <path>/mnt/nfs_share</path>
+    <dir path="/mnt/nfs_share"/> # директория на удалённом хосте
   </source>
+  <target>
+    <path>/mnt/nfs</path> # директория для монтирования NFS
+  </target>
 </pool>
 ```
 
