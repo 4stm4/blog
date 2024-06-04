@@ -16,7 +16,7 @@ sudo apt upgrade
 #### 2. Установка необходимых пакетов:
 ```bash
 sudo apt install cockpit cockpit-packagekit cockpit-system cockpit-storaged cockpit-networkmanager cockpit-machines
-sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virtinst
+sudo apt install qemu-system-x86 qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virtinst
 ```
 #### 3. Добавление пользователя в группы libvirt и kvm:
 ```bash
