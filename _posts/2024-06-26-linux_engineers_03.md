@@ -157,12 +157,15 @@ telnet 192.168.122.241 80
 nc -zv 192.168.122.241 1-1024
 ```
 
-Netcat отправляет вывод в специальные файл STDERR (стандартный поток ошибок), поэтому grep с Netcat работать не будет на прямую нужно перенаправить поток данных в STDOUT
+Netcat отправляет вывод в специальные файл STDERR (стандартный поток ошибок), 
+
+поэтому grep с Netcat работать не будет на прямую нужно перенаправить поток данных в STDOUT
+
 Три стандартных потока ввода-вывода:
 
-STDIN - 0
-STDOUT - 1
-STDERR - 2
+- STDIN - 0
+- STDOUT - 1
+- STDERR - 2
 
 Для перенаправления потока данных из STDERR в STDOUT используем данную команду `2>&1`
 
@@ -274,9 +277,13 @@ Host script results:
 	 сайт банка, чтобы красть учетные данные пользователей.
 
 `broadcast-eigrp-discovery`
+
 `broadcast-igmp-discovery`
+
 `broadcast-ospf2-discover`
+
 `broadcast-rip-discover`
+
 `broadcast-ripng-discover`
 
 	Нежелательные или вредоносные прокси-серверы.
@@ -295,6 +302,7 @@ Host script results:
 	DNS-серверы, о существовании которых вы не знали
 
 `broadcast-dns-service-discovery`
+
 `dns-srv-enum`
 
 	DNS-серверы с включенной рекурсией.
@@ -312,7 +320,9 @@ Host script results:
 	использоваться для кражи учетных данных.
 
 `dhcp-discover`
+
 `broadcast-dhcp-discover`
+
 `broadcast-dhcp6-discover`
 
 	Нелицензированные или «теневые» серверы баз данных.
@@ -329,10 +339,15 @@ Host script results:
 	(не редкость даже найти их без пароля администратора).
 
 `broadcast-ms-sql-discover`
+
 `broadcast-sybase-asa-discover`
+
 `oracle-tns-version`
+
 `broadcat-db2-discover`
+
 `couchdb-databases`
+
 `mongodb-info`
 
 	Персональные серверы Jenkins (используются для управления ис-
@@ -357,6 +372,7 @@ Host script results:
 	интернетом или узлы VPN, поддерживающие IKEv1.
 
 `ike-version`
+
 `http-cisco-anyconnect`
 
 	Сертификаты, не инвентаризированные ранее или с истекающим
@@ -368,12 +384,14 @@ Host script results:
 	может сильно подпортить вам жизнь!
 
 `ssl-cert`
+
 `ssl-date`
 
 	Службы SSL или TLS устаревших или нежелательных версий.
 	От SSL и TLS версии 1 следует полностью отказаться
 
 `ssl-dh-params`
+
 `ssl-enum-ciphers`
 
 	Серверы RDP с низким уровнем шифрования
@@ -385,6 +403,7 @@ Host script results:
 	ее следует обновить, если встретите
 
 `ssh2-enum-algos`
+
 `sshv1`
 
 	Другие службы, обычно нежелательные в сети компании
@@ -402,6 +421,7 @@ sudo kismet -c <имя беспроводного интерфейса>
 ```
 
 Eсли у вас есть полностью рабочая конфигурация и вам не нужно отображать
+
 данные сервера Kismet в консоли, выполните следующее:
 
 ```bash
