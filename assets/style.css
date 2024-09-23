@@ -128,7 +128,9 @@ pre {
   color: var(--select-color) !important;
 }
 
-
+.content {
+  left: 220px;
+}
 
 .side-menu {
   position: fixed;
