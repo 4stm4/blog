@@ -4,14 +4,14 @@
 }
 
 :root {
-  --bg-color: #323437;
+  --bg-color: #26493b;
   --bg-color-light: #45484c;
   --border-color: #4f5459;
   --border-color-light: #8b949e;
   --sub-color: #272727;
   --sub-color-light: #313131;
   --sub-color-brigth: #404040;
-  --active-color: #e2b714;
+  --active-color: #7abf9d;
   --select-color: #cb5800;
   --text-color: #d1d0c5;
   --color-btn-shadow: 0 0 transparent;
@@ -129,7 +129,7 @@ pre {
 }
 
 .content {
-  left: 220px;
+  margin-left: 210px;
 }
 
 .side-menu {
