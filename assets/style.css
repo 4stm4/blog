@@ -4,7 +4,7 @@
 }
 
 :root {
-  --bg-color: #26493b;
+  --bg-color: #060c09;
   --bg-color-light: #45484c;
   --border-color: #4f5459;
   --border-color-light: #8b949e;
@@ -39,6 +39,7 @@ a:hover {
 
 .list-group-item {
   background-color: var(--bg-color);
+  font-size: larger;
 }
 
 .site-title {
