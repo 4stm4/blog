@@ -127,3 +127,60 @@ pre {
 .color-fg-success {
   color: var(--select-color) !important;
 }
+
+
+
+.side-menu {
+  position: fixed;
+  top: 50px; /* Отступ чтобы не пересекаться с верхним меню */
+  left: 0;
+  width: 202px;
+  height: calc(100% - 50px); /* Учитываем пространство для верхнего меню */
+  background: url('/assets/images/logo.svg') no-repeat center center;
+  background-size: cover;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.side-menu nav {
+  margin-top: 150px; /* Отступ сверху для меню */
+}
+
+.side-menu nav ul {
+  list-style: none;
+  width: 100%;
+  padding: 0px;
+  padding-top: 40px;
+}
+
+.side-menu nav ul li {
+  margin: 0px 0;
+  text-align: center;
+}
+
+.side-menu nav ul li a {
+  display: block; /* Обеспечиваем что вся область будет интерактивной */
+}
+
+.side-menu nav ul li a img {
+  width: 202px;
+  height: 67px;
+  transition: filter 0.3s ease;
+}
+
+/* CSS для изменения цвета при наведении */
+.svg-container .Rectangle_linux:hover .frame-background {
+  fill: #22cc22; /* Или любой другой цвет, который вам нужен */
+  transition: fill 0.3s ease;
+}
+
+.linux_back:hover {
+  fill: #1e432c; /* цвет заливки при наведении */
+}
+
+.raspi_back:hover {
+  fill: #1e432c; /* цвет заливки при наведении */
+}
