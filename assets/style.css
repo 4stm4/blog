@@ -52,9 +52,9 @@ a:hover {
   color: var(--text-color);
 }
 
-.fixed-top {
+/* .fixed-top {
   background-color: var(--sub-color);
-}
+} */
 
 pre {
   padding: 16px;
@@ -140,6 +140,7 @@ pre {
   width: 202px;
   height: calc(100% - 50px); /* Учитываем пространство для верхнего меню */
   background: url('/assets/images/logo.svg') no-repeat center center;
+  background-color: var(--sub-color);
   background-size: cover;
   z-index: 1000;
   display: flex;
