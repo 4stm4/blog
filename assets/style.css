@@ -1,7 +1,3 @@
-@font-face {
-  font-family: "Caskaydia Cove";
-  src: url("Caskaydia Cove.ttf");
-}
 
 :root {
   --bg-color: #060c09;
@@ -24,12 +20,11 @@ body {
   margin-right: 50px;
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: Caskaydia Cove;
+  font-size: larger;
 }
 
 a {
   color: var(--active-color);
-  font-family: Caskaydia Cove;
   text-decoration: none;
 }
 
