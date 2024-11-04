@@ -134,9 +134,9 @@ pre {
   top: 0px; /* Отступ чтобы не пересекаться с верхним меню */
   left: 0;
   width: 202px;
-  height: calc(100% - 50px); /* Учитываем пространство для верхнего меню */
+  height: 100%; /* Учитываем пространство для верхнего меню */
   /* background: url('/assets/images/logo.svg') no-repeat center center; */
-  background-color: var(--sub-color);
+  background-color: #050a08;
   background-size: cover;
   z-index: 1000;
   display: flex;
@@ -146,7 +146,7 @@ pre {
 }
 
 .side-menu nav {
-  margin-top: 150px; /* Отступ сверху для меню */
+  margin-top: 50px; /* Отступ сверху для меню */
 }
 
 .side-menu nav ul {
