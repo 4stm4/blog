@@ -131,6 +131,7 @@ pre {
 
 .content {
   margin-left: 210px;
+  max-width: 1012px;
 }
 
 .side-menu {
@@ -139,7 +140,7 @@ pre {
   left: 0;
   width: 202px;
   height: calc(100% - 50px); /* Учитываем пространство для верхнего меню */
-  background: url('/assets/images/logo.svg') no-repeat center center;
+  /* background: url('/assets/images/logo.svg') no-repeat center center; */
   background-color: var(--sub-color);
   background-size: cover;
   z-index: 1000;

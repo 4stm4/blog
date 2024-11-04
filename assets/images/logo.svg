@@ -1,1 +1,31 @@
-<svg viewBox="24 24 178 178" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:penpot="https://penpot.app/xmlns" style="width:100%;height:100%;background:#E8E9EA" fill="none"><penpot:page id="cc95e04f-ce02-80da-8005-3901dea9fadd"></penpot:page><g id="shape-753f3e25-bb21-8074-8005-3901e85538ae"><penpot:shape penpot:name="Ellipse" penpot:blocked="false" penpot:hidden="false" penpot:type="circle" penpot:transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" penpot:transform-inverse="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" penpot:proportion="1" penpot:proportion-lock="false" penpot:rotation="0" penpot:center-x="113" penpot:center-y="113"><penpot:fills><penpot:fill penpot:fill-image-id="fill-image-render-16-0" penpot:fill-opacity="1"></penpot:fill></penpot:fills><penpot:layout-item penpot:layout-item-h-sizing="fix" penpot:layout-item-v-sizing="fix"></penpot:layout-item></penpot:shape><defs><pattern patternUnits="userSpaceOnUse" x="24" y="24" width="178" height="178" id="fill-0-render-16"><g><image id="fill-image-render-16-0" href="https://design.penpot.app/assets/by-file-media-id/cc95e04f-ce02-80da-8005-3901e8606abf" preserveAspectRatio="xMidYMid slice" width="178" height="178" opacity="1"></image></g></pattern></defs><g class="fills" id="fills-753f3e25-bb21-8074-8005-3901e85538ae"><ellipse cx="113" cy="113" rx="89" ry="89" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" fill="url(#fill-0-render-16)"></ellipse></g></g></svg>
+<svg viewBox="24 24 178 178" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:penpot="https://penpot.app/xmlns" style="width:100%;height:100%;background:#E8E9EA" fill="none">
+    <penpot:page id="cc95e04f-ce02-80da-8005-3901dea9fadd"></penpot:page>
+    <g id="shape-753f3e25-bb21-8074-8005-3901e85538ae">
+        <penpot:shape penpot:name="Ellipse" penpot:blocked="false" penpot:hidden="false" penpot:type="circle"
+            penpot:transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+            penpot:transform-inverse="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+            penpot:proportion="1" penpot:proportion-lock="false" penpot:rotation="0" penpot:center-x="113"
+            penpot:center-y="113">
+            <penpot:fills>
+                <penpot:fill penpot:fill-image-id="fill-image-render-16-0" penpot:fill-opacity="1"></penpot:fill>
+            </penpot:fills>
+            <penpot:layout-item penpot:layout-item-h-sizing="fix" penpot:layout-item-v-sizing="fix">
+            </penpot:layout-item>
+        </penpot:shape>
+        <defs>
+            <pattern patternUnits="userSpaceOnUse" x="24" y="24" width="178" height="178" id="fill-0-render-16">
+                <g>
+                    <image id="fill-image-render-16-0"
+                        href="https://design.penpot.app/assets/by-file-media-id/cc95e04f-ce02-80da-8005-3901e8606abf"
+                        preserveAspectRatio="xMidYMid slice" width="178" height="178" opacity="1"></image>
+                </g>
+            </pattern>
+        </defs>
+        <g class="fills" id="fills-753f3e25-bb21-8074-8005-3901e85538ae">
+            <ellipse cx="113" cy="113" rx="89" ry="89"
+                transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+                fill="url(#fill-0-render-16)"></ellipse>
+        </g>
+    </g>
+</svg>
