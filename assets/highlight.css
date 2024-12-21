@@ -6,6 +6,10 @@
     --border-color-light: #8b949e;
     --bg-color: #060c09;
     --sub-color: #272727;
+    --vkui--animation_duration_m: 0.2s;
+    --vkui--animation_duration_l: 0.4s;
+    --vkui--color_icon_tertiary: #656565;
+    --vkui--color_icon_secondary: #828282;
   }
   
 
