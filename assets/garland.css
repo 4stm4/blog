@@ -1,0 +1,136 @@
+.GarlandParts__root--GY7Sw {
+    display: flex;
+    position: relative
+}
+
+.GarlandParts__root--GY7Sw:not(.GarlandParts__rootVisible--TCO1L) {
+    opacity: 0
+}
+
+.GarlandParts__rootVisible--TCO1L.GarlandParts__rootAnimated--MVe70 {
+    animation: GarlandParts__fadeIn--FwPPE var(--vkui--animation_duration_l) forwards
+}
+
+.GarlandParts__switch--kWPVa.GarlandParts__switch--kWPVa {
+    top: -24px;
+    right: 47px;
+    z-index: -1;
+    padding: 0 10px;
+    position: fixed;
+    pointer-events: all;
+    color: var(--vkui--color_icon_tertiary);
+    transition: top var(--vkui--animation_duration_m)
+}
+
+[dir=rtl] .GarlandParts__switch--kWPVa.GarlandParts__switch--kWPVa {
+    right: auto;
+    left: 47px
+}
+
+@media (max-width: 1229px) {
+    .GarlandParts__switch--kWPVa.GarlandParts__switch--kWPVa {
+        display:none
+    }
+}
+
+.GarlandParts__switchHover--UdeMf.GarlandParts__switchHover--UdeMf {
+    top: -20px
+}
+
+.GarlandParts__switchActive--scvi7.GarlandParts__switchActive--scvi7 {
+    top: 0
+}
+
+.GarlandParts__lamp--8w4V3 {
+    color: var(--vkui--color_icon_secondary)
+}
+
+.GarlandParts__shadow--KvRCE {
+    color: transparent
+}
+
+.GarlandParts__item--kq3r6 {
+    z-index: 1;
+    overflow: visible;
+    color: var(--vkui--color_icon_tertiary)
+}
+
+.GarlandParts__item1--WI9ko {
+    margin-top: -5px;
+    margin-left: -9px
+}
+
+[dir=rtl] .GarlandParts__item1--WI9ko {
+    margin-left: 0;
+    margin-right: -9px
+}
+
+.GarlandParts__rootEnabled--r4Lma .GarlandParts__item1--WI9ko .GarlandParts__lamp--8w4V3,.GarlandParts__rootEnabled--r4Lma .GarlandParts__item1--WI9ko .GarlandParts__shadow--KvRCE {
+    color: #2787f5
+}
+
+.GarlandParts__item2--Tgp6z {
+    margin-top: -3px;
+    margin-left: -8px
+}
+
+[dir=rtl] .GarlandParts__item2--Tgp6z {
+    margin-left: 0;
+    margin-right: -8px
+}
+
+.GarlandParts__rootEnabled--r4Lma .GarlandParts__item2--Tgp6z .GarlandParts__lamp--8w4V3,.GarlandParts__rootEnabled--r4Lma .GarlandParts__item2--Tgp6z .GarlandParts__shadow--KvRCE {
+    color: #f679ff
+}
+
+.GarlandParts__item3--ODE8k {
+    margin-top: -8px;
+    margin-left: -8px
+}
+
+[dir=rtl] .GarlandParts__item3--ODE8k {
+    margin-left: 0;
+    margin-right: -8px
+}
+
+.GarlandParts__rootEnabled--r4Lma .GarlandParts__item3--ODE8k .GarlandParts__lamp--8w4V3,.GarlandParts__rootEnabled--r4Lma .GarlandParts__item3--ODE8k .GarlandParts__shadow--KvRCE {
+    color: #17d685
+}
+
+.GarlandParts__item4--8HLpR {
+    margin-top: -6px;
+    margin-left: -8px
+}
+
+[dir=rtl] .GarlandParts__item4--8HLpR {
+    margin-left: 0;
+    margin-right: -8px
+}
+
+.GarlandParts__rootEnabled--r4Lma .GarlandParts__item4--8HLpR .GarlandParts__lamp--8w4V3,.GarlandParts__rootEnabled--r4Lma .GarlandParts__item4--8HLpR .GarlandParts__shadow--KvRCE {
+    color: #ffd91d
+}
+
+.GarlandParts__item5--UVQGM {
+    margin-top: -7px;
+    margin-left: -10px
+}
+
+[dir=rtl] .GarlandParts__item5--UVQGM {
+    margin-left: 0;
+    margin-right: -10px
+}
+
+.GarlandParts__rootEnabled--r4Lma .GarlandParts__item5--UVQGM .GarlandParts__lamp--8w4V3,.GarlandParts__rootEnabled--r4Lma .GarlandParts__item5--UVQGM .GarlandParts__shadow--KvRCE {
+    color: #ab47e9
+}
+
+@keyframes GarlandParts__fadeIn--FwPPE {
+    0% {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
