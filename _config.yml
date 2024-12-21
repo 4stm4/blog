@@ -28,7 +28,6 @@ theme: minima
 plugins:
     - jekyll-seo-tag
     - jekyll-sitemap
-    - jekyll-mathjax-csp
 # plugins:
 #   - jekyll-feed
 
