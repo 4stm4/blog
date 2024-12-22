@@ -47,9 +47,9 @@ a:hover {
   color: var(--text-color);
 }
 
-/* .fixed-top {
+.fixed-top {
   background-color: var(--sub-color);
-} */
+}
 
 pre {
   padding: 16px;
@@ -131,7 +131,7 @@ pre {
 
 .side-menu {
   position: fixed;
-  top: 0px; /* Отступ чтобы не пересекаться с верхним меню */
+  top: 50px; /* Отступ чтобы не пересекаться с верхним меню */
   left: 0;
   width: 202px;
   height: 100%; /* Учитываем пространство для верхнего меню */
