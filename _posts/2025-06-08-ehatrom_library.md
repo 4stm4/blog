@@ -117,12 +117,3 @@ fn generate_eeprom(buf: &mut [u8]) -> Result<usize, ehatrom::Error> {
  Документация: [https://docs.rs/ehatrom/latest/ehatrom/](https://docs.rs/ehatrom/latest/ehatrom/)
 
 Если вы разрабатываете своё железо под Raspberry Pi — обязательно попробуйте!
-
----
-
-Если хотите, я могу:
-
-* сгенерировать версию статьи в Markdown,
-* добавить больше примеров (например, с `.dtbo`),
-* сделать CLI-пример (если у вас есть такая утилита),
-* подготовить пошаговую инструкцию по прошивке EEPROM-файла.
