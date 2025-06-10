@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Краткий экскурс о модулях в Linux"
-date:   2025-06-11 22:22:22 +0500
+date:   2025-06-10 22:22:22 +0500
 categories: linux
 ---
 
