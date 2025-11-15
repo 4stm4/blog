@@ -1,21 +1,29 @@
 ---
 layout: default
 ---
-<meta name="example" content="python, snort, R, raspberry pico, blockchain, react, typescript"/>
-<meta name="description" content= {{ page.title }} />
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="{{site.url}}/assets/highlight.css" rel="stylesheet">
-<body>
-
-<br>
-<br>
-  {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-
-  {{ page.date | date: date_format }}
-<br>
-  {{ content }}
-<br>
-  <script src="{{site.url}}/assets/js/code.js"></script>
-  <script src="{{site.url}}/assets/js/clipboard.js"></script>
-  <script src="{{site.url}}/assets/js/clipboard_copy_component.js"></script>
-</body>
+<article class="post-article">
+  <header class="post-header">
+    {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
+    <p class="post-header-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: date_format }}</time>
+      {%- if page.categories and page.categories.size > 0 -%}
+      ·
+      <span class="post-header-categories">
+        {%- for category in page.categories -%}
+        <a href="{{ '/categories/#' | append: category | slugify | relative_url }}">{{ category | replace: '_', ' ' | capitalize }}</a>{% unless forloop.last %}, {% endunless %}
+        {%- endfor -%}
+      </span>
+      {%- endif -%}
+    </p>
+    <h1 class="post-header-title">{{ page.title | escape }}</h1>
+    {%- if page.description -%}
+    <p class="post-header-description">{{ page.description }}</p>
+    {%- endif -%}
+  </header>
+  <div class="post-content">
+    {{ content }}
+  </div>
+  <footer class="post-footer">
+    <p class="post-footer-text">Понравилась статья? Напишите автору на <a href="mailto:{{ site.email }}">{{ site.email }}</a> или поделитесь ссылкой — это помогает блогу развиваться.</p>
+  </footer>
+</article>

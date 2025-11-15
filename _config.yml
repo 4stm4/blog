@@ -19,17 +19,24 @@
 # in the templates via {{ site.myvariable }}.
 
 title: this_is_the_way
-email: i@4stm4.ru 
+email: i@4stm4.ru
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://4stm4.ru/" # the base hostname & protocol for your site, e.g. http://example.com
+description: >-
+  Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании.
+lang: ru
+timezone: Europe/Moscow
+author:
+  name: "4stm4"
+  email: i@4stm4.ru
+show_excerpts: true
 
 # Build settings
 theme: minima
 plugins:
     - jekyll-seo-tag
     - jekyll-sitemap
-# plugins:
-#   - jekyll-feed
+    - jekyll-feed
 
 # Exclude from processing.
 # The following items will not be processed, by default.
