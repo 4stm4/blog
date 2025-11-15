@@ -29,8 +29,9 @@ gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 gem "kramdown-syntax-coderay", "~> 1.0"
 
 group :jekyll_plugins do
-  gem 'jekyll-commonmark-ghpages'
+  gem "jekyll-commonmark-ghpages"
+  gem "jekyll-seo-tag"
+  gem "jekyll-sitemap"
+  gem "jekyll-feed"
 end
 gem "molinillo", "~> 0.8.0"
-gem 'jekyll-seo-tag'
-gem 'jekyll-sitemap'

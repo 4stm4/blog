@@ -1,6 +1,9 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
 layout: home
+title: "Блог инженера 4stm4"
+hero_title: "Инженерия, которая работает"
+hero_kicker: "this_is_the_way"
+intro_lead: "От Kubernetes и системного программирования до электроники и Raspberry Pi — все, что помогает строить надежные продукты."
+description: "Материалы о Linux, DevOps, безопасности, разработке и встраиваемых системах от инженера-практика."
 ---
+<p class="intro-text">Здесь собраны конспекты, инструкции и пошаговые эксперименты для тех, кто настраивает инфраструктуру, пишет код, внедряет системы безопасности и любит разбираться в железе. Свежие заметки выходят регулярно — заглядывайте чаще!</p>
