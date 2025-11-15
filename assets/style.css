@@ -492,6 +492,8 @@ a:focus {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+  grid-auto-rows: 1fr;
+  align-items: stretch;
 }
 
 .category-card {
@@ -500,6 +502,11 @@ a:focus {
   background: rgba(17, 26, 21, 0.92);
   border: 1px solid rgba(122, 191, 157, 0.18);
   box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  overflow: hidden;
 }
 
 .category-title {
@@ -516,8 +523,13 @@ a:focus {
   list-style: none;
   margin: 1rem 0 0;
   padding: 0;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.45rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.35rem;
 }
 
 .category-links li {
