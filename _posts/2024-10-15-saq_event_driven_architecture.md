@@ -2,7 +2,7 @@
 layout: post
 title:  "Simple Async Queue в событийно-ориентированной архитектуре на Python 3"
 date:   2024-10-15 14:14:14 +0500
-categories: python3
+categories: programming
 ---
 
 ### Добавление очереди задач в событийно-ориентированную архитектуру на Python 3 с использованием saq

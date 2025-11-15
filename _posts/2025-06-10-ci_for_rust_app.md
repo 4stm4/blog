@@ -2,7 +2,7 @@
 layout: post
 title:  "Тестируем Rust-проекты с помощью Docker и Makefile"
 date:   2025-06-10 09:09:00 +0500
-categories: rust, docker, cargo
+categories: programming
 ---
 
 

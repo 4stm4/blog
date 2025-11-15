@@ -2,7 +2,7 @@
 layout: post
 title:  "Pico: компиляция проекта на asm"
 date:   2023-06-12 16:55:55 +0500
-categories: asm
+categories: hardware
 ---
 
 ##### Pico: компиляция проекта на asm

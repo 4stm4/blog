@@ -6,7 +6,7 @@ description: "Подборки статей по ключевым темам: Li
 ---
 <section class="category-archive" aria-labelledby="category-archive-heading">
   <h1 id="category-archive-heading">Категории блога</h1>
-  <p class="category-intro">Выберите направление и найдите подборку статей с инструкциями, примерами и конспектами для решения практических задач.</p>
+  <p class="category-intro">Мы собрали материалы в пять основных направлений — Linux, Programming, Hardware, Security и Tools — чтобы быстрее находить нужные инструкции, конспекты и примеры.</p>
   <div class="category-grid">
     {%- assign sorted_categories = site.categories | sort -%}
     {%- for category in sorted_categories -%}

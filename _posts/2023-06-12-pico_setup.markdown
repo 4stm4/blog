@@ -2,7 +2,7 @@
 layout: post
 title:  "Подключение Raspberry Pi Pico"
 date:   2023-06-12 9:44:44 +0500
-categories: asm
+categories: hardware
 ---
 
 ##### Подключение Raspberry Pi Pico
