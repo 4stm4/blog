@@ -1,10 +1,18 @@
-function createNode(text) {
-    const node = document.createElement('pre');
+function hasModernClipboard() {
+    return typeof navigator !== 'undefined' && navigator != null && navigator.clipboard != null && typeof navigator.clipboard.writeText === 'function';
+  }
+
+  function createNode(text) {
+    const node = document.createElement('textarea');
+    node.value = text != null ? text : '';
+    node.setAttribute('readonly', '');
     node.style.width = '1px';
     node.style.height = '1px';
     node.style.position = 'fixed';
-    node.style.top = '5px';
-    node.textContent = text != null ? text : '';
+    node.style.opacity = '0';
+    node.style.left = '-9999px';
+    node.style.top = '0';
+    node.style.pointerEvents = 'none';
     return node;
   }
 
@@ -15,16 +23,40 @@ function createNode(text) {
       return Promise.reject(new Error('Unable to access selection for clipboard copy.'));
     }
 
-    selection.removeAllRanges();
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    selection.addRange(range);
+    const activeElement = document.activeElement;
+    const isEditableInput = node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement;
 
     let result;
+
     try {
+      if (isEditableInput) {
+        node.focus();
+        node.select();
+        if (typeof node.setSelectionRange === 'function') {
+          node.setSelectionRange(0, node.value.length);
+        }
+      } else {
+        selection.removeAllRanges();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.addRange(range);
+      }
+
       result = document.execCommand('copy');
+    } catch (error) {
+      return Promise.reject(error);
     } finally {
-      selection.removeAllRanges();
+      if (!isEditableInput) {
+        selection.removeAllRanges();
+      } else {
+        if (typeof node.blur === 'function') {
+          node.blur();
+        }
+      }
+
+      if (activeElement && typeof activeElement.focus === 'function' && activeElement !== node) {
+        activeElement.focus();
+      }
     }
 
     return result ? Promise.resolve() : Promise.reject(new Error('execCommand copy failed.'));
@@ -53,7 +85,7 @@ function createNode(text) {
   }
 
   function copyNode(node) {
-    if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    if (hasModernClipboard()) {
       const nodeText = node.textContent != null ? node.textContent : '';
       return navigator.clipboard.writeText(nodeText)
         .catch(() => legacyCopyNode(node));
@@ -63,13 +95,13 @@ function createNode(text) {
   }
 
   function copyText(text) {
-    if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    if (hasModernClipboard()) {
       const safeText = text != null ? text : '';
       return navigator.clipboard.writeText(safeText)
-        .catch(() => legacyCopyText(text));
+        .catch(() => legacyCopyText(safeText));
     }
 
-    return legacyCopyText(text);
+    return legacyCopyText(text != null ? text : '');
   }
   
   function copy(button) {
