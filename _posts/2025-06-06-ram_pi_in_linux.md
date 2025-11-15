@@ -2,7 +2,7 @@
 layout: post
 title:  "Оптимизация управления памятью на Raspberry Pi в Linux"
 date:   2025-06-06 22:22:00 +0500
-categories: raspberry pi, linux
+categories: hardware
 ---
 
 # Оптимизация управления памятью на Raspberry Pi в Linux системах

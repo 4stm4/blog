@@ -2,7 +2,7 @@
 layout: post
 title:  "Базовые знания Windows"
 date:   2024-02-14 23:23:23 +0500
-categories: windows
+categories: tools
 ---
 
 ## Базовые знания Windows

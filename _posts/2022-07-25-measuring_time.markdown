@@ -2,7 +2,7 @@
 layout: post
 title:  "python time measuring"
 date:   2022-07-25 22:00:56 +0500
-categories: python
+categories: programming
 ---
 
 #### Measuring time in `python`

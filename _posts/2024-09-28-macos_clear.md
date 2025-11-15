@@ -2,7 +2,7 @@
 layout: post
 title:  "Поиск 'Системных данных' в MacOS для очистки диска"
 date:   2024-09-28 22:33:33 +0500
-categories: mac.os
+categories: tools
 ---
 
 ### Инструкция по очистке macOS от крупных файлов

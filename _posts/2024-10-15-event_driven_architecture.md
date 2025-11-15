@@ -2,7 +2,7 @@
 layout: post
 title:  "Событийно-ориентированная архитектура на Python 3"
 date:   2024-10-15 13:13:13 +0500
-categories: python3
+categories: programming
 ---
 
 ### Событийно-ориентированная архитектура на Python 3 с использованием AnyIO и паттерна Message Bus

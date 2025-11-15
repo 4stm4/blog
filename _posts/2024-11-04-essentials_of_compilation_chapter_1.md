@@ -2,7 +2,7 @@
 layout: post
 title:  "Основы компиляции с использованием инкрементного подхода в python. Введение. Глава 1"
 date:   2024-11-04 12:12:12 +0500
-categories: python
+categories: programming
 ---
 
 

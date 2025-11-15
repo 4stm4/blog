@@ -2,7 +2,7 @@
 layout: post
 title:  "Обзор библиотеки ehatrom для работы с EEPROM Raspberry Pi HAT"
 date:   2025-06-08 17:11:00 +0500
-categories: raspberry pi, linux
+categories: hardware
 ---
 
 # Библиотека `ehatrom`: работа с EEPROM-образами Raspberry Pi HAT на Rust
