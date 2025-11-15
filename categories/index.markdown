@@ -8,7 +8,7 @@ description: "Подборки статей по ключевым темам: Li
   <h1 id="category-archive-heading">Категории блога</h1>
   <p class="category-intro">Выберите направление и найдите подборку статей с инструкциями, примерами и конспектами для решения практических задач.</p>
   <div class="category-grid">
-    {%- assign sorted_categories = site.categories | sort_natural -%}
+    {%- assign sorted_categories = site.categories | sort -%}
     {%- for category in sorted_categories -%}
     {%- assign category_name = category[0] -%}
     {%- assign posts_in_category = category[1] -%}
