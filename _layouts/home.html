@@ -27,7 +27,7 @@ layout: default
       <a class="section-link" href="{{ '/categories/' | relative_url }}">Все категории</a>
     </div>
     <div class="topic-grid">
-      {%- assign sorted_categories = site.categories | sort_natural -%}
+      {%- assign sorted_categories = site.categories | sort -%}
       {%- for category in sorted_categories limit:6 -%}
       {%- assign category_name = category[0] -%}
       {%- assign posts_in_category = category[1] -%}
