@@ -1,52 +1,107 @@
-function createNode(text) {
-    const node = document.createElement('pre');
+function hasModernClipboard() {
+    return typeof navigator !== 'undefined' && navigator != null && navigator.clipboard != null && typeof navigator.clipboard.writeText === 'function';
+  }
+
+  function createNode(text) {
+    const node = document.createElement('textarea');
+    node.value = text != null ? text : '';
+    node.setAttribute('readonly', '');
     node.style.width = '1px';
     node.style.height = '1px';
     node.style.position = 'fixed';
-    node.style.top = '5px';
-    node.textContent = text;
+    node.style.opacity = '0';
+    node.style.left = '-9999px';
+    node.style.top = '0';
+    node.style.pointerEvents = 'none';
     return node;
   }
-  
-  function copyNode(node) {
-    if ('clipboard' in navigator) {
-      // eslint-disable-next-line flowtype/no-flow-fix-me-comments
-      // $FlowFixMe Clipboard is not defined in Flow yet.
-      return navigator.clipboard.writeText(node.textContent);
-    }
-  
-    const selection = getSelection();
-  
+
+  function legacyCopyNode(node) {
+    const selection = window.getSelection();
+
     if (selection == null) {
-      return Promise.reject(new Error());
+      return Promise.reject(new Error('Unable to access selection for clipboard copy.'));
     }
-  
-    selection.removeAllRanges();
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    selection.addRange(range);
-    document.execCommand('copy');
-    selection.removeAllRanges();
-    return Promise.resolve();
+
+    const activeElement = document.activeElement;
+    const isEditableInput = node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement;
+
+    let result;
+
+    try {
+      if (isEditableInput) {
+        node.focus();
+        node.select();
+        if (typeof node.setSelectionRange === 'function') {
+          node.setSelectionRange(0, node.value.length);
+        }
+      } else {
+        selection.removeAllRanges();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.addRange(range);
+      }
+
+      result = document.execCommand('copy');
+    } catch (error) {
+      return Promise.reject(error);
+    } finally {
+      if (!isEditableInput) {
+        selection.removeAllRanges();
+      } else {
+        if (typeof node.blur === 'function') {
+          node.blur();
+        }
+      }
+
+      if (activeElement && typeof activeElement.focus === 'function' && activeElement !== node) {
+        activeElement.focus();
+      }
+    }
+
+    return result ? Promise.resolve() : Promise.reject(new Error('execCommand copy failed.'));
   }
-  function copyText(text) {
-    if ('clipboard' in navigator) {
-      // eslint-disable-next-line flowtype/no-flow-fix-me-comments
-      // $FlowFixMe Clipboard is not defined in Flow yet.
-      return navigator.clipboard.writeText(text);
-    }
-  
+
+  function legacyCopyText(text) {
     const body = document.body;
-  
+
     if (!body) {
-      return Promise.reject(new Error());
+      return Promise.reject(new Error('Unable to find document body for clipboard copy.'));
     }
-  
+
     const node = createNode(text);
     body.appendChild(node);
-    copyNode(node);
-    body.removeChild(node);
-    return Promise.resolve();
+    return legacyCopyNode(node)
+      .then(
+        (value) => {
+          body.removeChild(node);
+          return value;
+        },
+        (error) => {
+          body.removeChild(node);
+          throw error;
+        }
+      );
+  }
+
+  function copyNode(node) {
+    if (hasModernClipboard()) {
+      const nodeText = node.textContent != null ? node.textContent : '';
+      return navigator.clipboard.writeText(nodeText)
+        .catch(() => legacyCopyNode(node));
+    }
+
+    return legacyCopyNode(node);
+  }
+
+  function copyText(text) {
+    if (hasModernClipboard()) {
+      const safeText = text != null ? text : '';
+      return navigator.clipboard.writeText(safeText)
+        .catch(() => legacyCopyText(safeText));
+    }
+
+    return legacyCopyText(text != null ? text : '');
   }
   
   function copy(button) {
@@ -58,14 +113,18 @@ function createNode(text) {
         bubbles: true
       }));
     }
-  
+
+    function handleError(error) {
+      console.error('clipboard-copy: unable to copy content', error);
+    }
+
     if (text) {
-      copyText(text).then(trigger);
+      copyText(text).then(trigger).catch(handleError);
     } else if (id) {
       const root = 'getRootNode' in Element.prototype ? button.getRootNode() : button.ownerDocument;
       if (!(root instanceof Document || 'ShadowRoot' in window && root instanceof ShadowRoot)) return;
       const node = root.getElementById(id);
-      if (node) copyTarget(node).then(trigger);
+      if (node) copyTarget(node).then(trigger).catch(handleError);
     }
   }
   
@@ -137,7 +196,6 @@ function createNode(text) {
   if (!window.customElements.get('clipboard-copy')) {
     window.ClipboardCopyElement = ClipboardCopyElement;
     window.customElements.define('clipboard-copy', ClipboardCopyElement);
-    console.log('ClipboardCopyElement')
   }
   
   // export default ClipboardCopyElement;
