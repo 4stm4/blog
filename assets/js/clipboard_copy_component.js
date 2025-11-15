@@ -22,24 +22,22 @@ function showCheck(button) {
     showSVG(checkIcon);
 }
 const clipboardCopyElementTimers = new WeakMap();
-console.log('start');
 document.addEventListener('clipboard-copy', function ({ target }) {
     if (!(target instanceof HTMLElement))
         return;
-    console.log(target)
-    // if (!target.hasAttribute('data-view-component'))
-    //     return;
-    console.log('Evet');
-    const currentTimeout = clipboardCopyElementTimers.get(target);
+    const button = target.closest('clipboard-copy');
+    if (!(button instanceof HTMLElement))
+        return;
+    const currentTimeout = clipboardCopyElementTimers.get(button);
     if (currentTimeout) {
         clearTimeout(currentTimeout);
-        clipboardCopyElementTimers.delete(target);
+        clipboardCopyElementTimers.delete(button);
     }
     else {
-        showCheck(target);
+        showCheck(button);
     }
-    clipboardCopyElementTimers.set(target, setTimeout(() => {
-        showCopy(target);
-        clipboardCopyElementTimers.delete(target);
+    clipboardCopyElementTimers.set(button, setTimeout(() => {
+        showCopy(button);
+        clipboardCopyElementTimers.delete(button);
     }, CLIPBOARD_COPY_TIMER_DURATION));
 });
