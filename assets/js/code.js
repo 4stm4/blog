@@ -1,4 +1,4 @@
-var clipboard_copy = " \
+const clipboard_copy = " \
 <div class='zeroclipboard-container position-absolute right-0 top-0'> \
     <clipboard-copy aria-label='Copy' \
         class='ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay' \
@@ -26,19 +26,61 @@ var clipboard_copy = " \
     </clipboard-copy> \
 </div>";
 
-var python_logo = "<div class='python-label'>PYTHON CODE</div>";
+const python_logo = "<div class='python-label'>PYTHON CODE</div>";
+
 $(function () {
-    $('pre').wrap('<div class="snippet-clipboard-content"></div>');
-    $('blockquote').wrap('<div class="output"></div>');
-    $('.output').wrap('<div class="output-wrap"></div>');
-    $('.output-wrap').append('<div class="output-label">OUTPUT</div>');
-    $('.language-python').append(python_logo);
-    $('.snippet-clipboard-content').append(clipboard_copy);
-    $('.language-cmd').parent().parent().wrap('<div class="cmd-wrap"></div>');
-    $('.cmd-wrap').append('<div class="cmd-label">CLI COMMAND</div>');
-    $('img').wrap('<div class="img-wrap"></div>>');
-    $('.img-wrap').append('<div class="img-label">IMAGE</div>');
-    $('code').each(function (i) {
-        $(this).parent().siblings('.zeroclipboard-container').children('clipboard-copy').attr('value', $(this).text());
+    $('pre').each(function () {
+        const $pre = $(this);
+        if ($pre.parent('.snippet-clipboard-content').length === 0) {
+            $pre.wrap('<div class="snippet-clipboard-content"></div>');
+        }
+    });
+
+    $('.snippet-clipboard-content').each(function () {
+        const $container = $(this);
+        if ($container.children('.zeroclipboard-container').length === 0) {
+            $container.append(clipboard_copy);
+        }
+    });
+
+    $('.language-python').each(function () {
+        const $languageBlock = $(this);
+        if ($languageBlock.children('.python-label').length === 0) {
+            $languageBlock.append(python_logo);
+        }
+    });
+
+    $('[data-output="true"]').each(function () {
+        const $blockquote = $(this);
+        if ($blockquote.closest('.output-wrap').length === 0) {
+            $blockquote.wrap('<div class="output"></div>')
+                .parent().wrap('<div class="output-wrap"></div>');
+            $blockquote.closest('.output-wrap').append('<div class="output-label">OUTPUT</div>');
+        }
+    });
+
+    $('.language-cmd').each(function () {
+        const $block = $(this);
+        const $snippet = $block.find('.snippet-clipboard-content').first();
+        if ($snippet.length && $snippet.parent('.cmd-wrap').length === 0) {
+            $snippet.wrap('<div class="cmd-wrap"></div>');
+            $snippet.parent().append('<div class="cmd-label">CLI COMMAND</div>');
+        }
+    });
+
+    $('img').each(function () {
+        const $img = $(this);
+        if ($img.parent('.img-wrap').length === 0) {
+            $img.wrap('<div class="img-wrap"></div>');
+            $img.parent().append('<div class="img-label">IMAGE</div>');
+        }
+    });
+
+    $('.snippet-clipboard-content code').each(function () {
+        const $code = $(this);
+        const $button = $code.closest('.snippet-clipboard-content').find('.zeroclipboard-container clipboard-copy');
+        if ($button.length) {
+            $button.attr('value', $code.text());
+        }
     });
 });
