@@ -51,7 +51,14 @@
     crossorigin="anonymous"></script>
   {%- if page.layout == 'post' -%}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-    integrity="sha256-/xUj+3OJ+Y7apn4BtvITxV3SJ46FhC0G4Jy0lv8Y4gE=" crossorigin="anonymous"></script>
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script>
+    // Fallback to local jQuery if CDN fails
+    if (typeof jQuery == 'undefined') {
+      console.warn('jQuery CDN failed, using fallback');
+      document.write('<script src="{{ "/assets/js/jquery-3.6.0.min.js" | relative_url }}"><\/script>');
+    }
+  </script>
   <script src="{{ '/assets/js/code.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/clipboard.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/clipboard_copy_component.js' | relative_url }}"></script>

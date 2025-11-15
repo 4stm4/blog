@@ -531,13 +531,17 @@ a:focus {
 pre {
   padding: 16px;
   margin: 0;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   font-size: 0.9rem;
   line-height: 1.45;
   background-color: var(--sub-color);
   border-radius: 12px;
   border: 1px solid var(--border-color);
   font-family: "Cascadia Code", "Fira Code", monospace;
+  max-width: 100%;
+  white-space: pre;
+  word-wrap: normal;
 }
 
 code {
@@ -549,6 +553,8 @@ code {
   animation: fade-out 200ms both;
   display: block;
   position: relative !important;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .snippet-clipboard-content:hover .zeroclipboard-container {
@@ -557,6 +563,10 @@ code {
 
 .zeroclipboard-container {
   display: none;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 10;
 }
 
 .badge {

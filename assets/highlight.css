@@ -36,15 +36,20 @@
     color: #8b949e;
     display: block;
     position: relative !important;
+    max-width: 100%;
 }
 .python-label {
     color: var(--bg-color);
     margin: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 3px 8px;
     position: absolute !important;
-    top: 0px;
+    top: 8px;
+    right: 8px;
     background-color: var(--border-color-light);
+    border-radius: 4px;
+    font-size: 10px;
+    z-index: 5;
+    pointer-events: none;
 }
 .highlight{
     font-size: 14px;
@@ -53,40 +58,50 @@
     margin: 10px 0px 10px 0px;
     display: block;
     position: relative !important;
+    max-width: 100%;
 }
 .output {
     background-color: var(--sub-color);
     border-radius: 6px;
+    overflow-x: auto;
+    max-width: 100%;
 }
 .output-label {
     font-size: 10px;
     margin: 0px;
-    padding-left: 3px;
+    padding: 3px 5px;
     text-orientation: upright;
     writing-mode: vertical-lr; 
     top: 0px;
     left: 0px;
     position: absolute !important;
+    z-index: 5;
 }
 blockquote {
     margin: 0px 0px 0px 20px;
     padding: 17px 5px 17px 15px;
     background-color: var(--bg-color-light);
     border-radius: 0px 6px 6px 0px;
+    overflow-x: auto;
+    max-width: calc(100% - 20px);
 }
 .cmd-wrap {
     display: block;
     position: relative !important;
+    max-width: 100%;
 }
 .cmd-label {
     color: var(--bg-color);
     font-size: 10px;
     margin: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 3px 8px;
     position: absolute !important;
-    top: 0px;
+    top: 8px;
+    right: 8px;
     background-color: var(--border-color-light);
+    border-radius: 4px;
+    z-index: 5;
+    pointer-events: none;
 }
 li::marker {
     color: var(--select-color);
@@ -104,16 +119,19 @@ li::marker {
     border: 1px;
     border-style: solid;
     border-color: var(--border-color);
+    max-width: 100%;
+    overflow: hidden;
 }
 .img-label {
     font-size: 10px;
     margin: 0px;
-    padding-left: 3px;
+    padding: 3px 5px;
     text-orientation: upright;
     writing-mode: vertical-lr; 
     top: 0px;
     left: 0px;
     position: absolute !important;
+    z-index: 5;
 }
 
 img {
@@ -122,4 +140,6 @@ img {
     background-color: var(--bg-color-light);
     border-radius: 0px 6px 6px 0px;
     background-size: 100%;
+    max-width: calc(100% - 40px);
+    height: auto;
 }
