@@ -17,7 +17,7 @@ description: "Подборки статей по ключевым темам: Li
       <p class="category-summary">{{ category_name | replace: '_', ' ' | capitalize }} — {{ posts_in_category | size }} материалов с пошаговыми инструкциями и аналитикой.</p>
       <ul class="category-links">
         {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
-        {%- for post in posts_in_category limit:3 -%}
+  {%- for post in posts_in_category -%}
         <li>
           <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
