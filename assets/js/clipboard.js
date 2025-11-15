@@ -4,7 +4,7 @@ function createNode(text) {
     node.style.height = '1px';
     node.style.position = 'fixed';
     node.style.top = '5px';
-    node.textContent = text;
+    node.textContent = text != null ? text : '';
     return node;
   }
 
@@ -40,9 +40,16 @@ function createNode(text) {
     const node = createNode(text);
     body.appendChild(node);
     return legacyCopyNode(node)
-      .finally(() => {
-        body.removeChild(node);
-      });
+      .then(
+        (value) => {
+          body.removeChild(node);
+          return value;
+        },
+        (error) => {
+          body.removeChild(node);
+          throw error;
+        }
+      );
   }
 
   function copyNode(node) {
