@@ -99,9 +99,9 @@
 
   // Extract readable text nodes respecting exclusions
   function extractWords(container, options, done){
-    const allowed = Array.from(container.querySelectorAll('p, h2, h3, h4, li, blockquote'));
+    const allowed = Array.from(container.querySelectorAll('p, h2, h3, h4, li, blockquote, pre, code'));
     const words = [];
-    const skipSelectors = 'pre, code, table, .commands, .cli, [data-no-rsvp="true"]';
+    const skipSelectors = 'table, .commands, .cli, [data-no-rsvp="true"]';
     const pushClean = (text)=>{
       const cleaned = text.replace(/\s+/g,' ').trim();
       if(!cleaned) return;
