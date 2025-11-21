@@ -87,6 +87,7 @@
       .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
       .rsvp-screen + .rsvp-controls .rsvp-progress{width:100%;}
       .rsvp-screen + .rsvp-controls{margin-top:0.25rem;}
+      .rsvp-inline-highlight{background:rgba(203, 88, 0, 0.28);color:inherit;border-radius:8px;padding:0 0.12em;}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
     `;
     document.head.appendChild(style);
@@ -101,13 +102,65 @@
   function extractWords(container, options, done){
     const allowed = Array.from(container.querySelectorAll('p, h2, h3, h4, li, blockquote, pre, code'));
     const words = [];
+    const anchors = [];
     const skipSelectors = 'table, .commands, .cli, [data-no-rsvp="true"]';
-    const pushClean = (text)=>{
-      const cleaned = text.replace(/\s+/g,' ').trim();
+    const collectTextNodes = (el)=>{
+      const nodes = [];
+      let offset = 0;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+        acceptNode(node){
+          return node.nodeValue && node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      let current;
+      while((current = walker.nextNode())){
+        nodes.push({node: current, start: offset, end: offset + current.nodeValue.length});
+        offset += current.nodeValue.length;
+      }
+      return nodes;
+    };
+
+    const anchorRange = (textNodes, start, end)=>{
+      let startNode = null;
+      let startOffset = 0;
+      let endNode = null;
+      let endOffset = 0;
+      for(const info of textNodes){
+        if(!startNode && start < info.end){
+          startNode = info.node;
+          startOffset = Math.max(0, start - info.start);
+        }
+        if(startNode && end <= info.end){
+          endNode = info.node;
+          endOffset = Math.max(0, end - info.start);
+          break;
+        }
+      }
+      if(!startNode || !endNode) return null;
+      const range = document.createRange();
+      range.setStart(startNode, startOffset);
+      range.setEnd(endNode, endOffset);
+      return range;
+    };
+
+    const pushWithAnchors = (el)=>{
+      const rawText = el.textContent || '';
+      const cleaned = rawText.replace(/\s+/g,' ').trim();
       if(!cleaned) return;
       // drop footer-like phrases
       if(/понравилась статья|поделиться|рассылка/i.test(cleaned)) return;
-      cleaned.split(/\s+/).forEach(w=>words.push(w));
+
+      const textNodes = collectTextNodes(el);
+      for(const match of rawText.matchAll(/\S+/g)){
+        words.push(match[0]);
+        const range = anchorRange(textNodes, match.index, match.index + match[0].length);
+        anchors.push(range ? {
+          startContainer: range.startContainer,
+          startOffset: range.startOffset,
+          endContainer: range.endContainer,
+          endOffset: range.endOffset
+        } : null);
+      }
     };
 
     // Process in idle chunks for huge posts
@@ -117,12 +170,12 @@
       for(; index < end; index++){
         const el = allowed[index];
         if(isInside(el, skipSelectors)) continue;
-        pushClean(el.textContent || '');
+        pushWithAnchors(el);
       }
       if(index < allowed.length){
         ric(processChunk);
       } else {
-        done(words);
+        done({words, anchors});
       }
     };
     processChunk();
@@ -305,9 +358,53 @@
   }
 
   // Runner that handles scheduling
-  function createPlayer(words, state, ui, article, isPanelOpen){
+  function createPlayer(words, state, ui, article, isPanelOpen, anchors){
     let timer = null;
     const freqMapHolder = {data:null, loaded:false};
+    let lastHighlightStart = 0;
+    let activeMarks = [];
+
+    const removeMark = (mark)=>{
+      if(!mark || !mark.parentNode) return;
+      const parent = mark.parentNode;
+      while(mark.firstChild){
+        parent.insertBefore(mark.firstChild, mark);
+      }
+      parent.removeChild(mark);
+    };
+
+    const clearHighlights = ()=>{
+      if(!activeMarks.length) return;
+      activeMarks.forEach(removeMark);
+      activeMarks = [];
+    };
+
+    const createInlineMark = (anchor)=>{
+      if(!anchor || !anchor.startContainer || !anchor.endContainer) return null;
+      try {
+        const range = document.createRange();
+        range.setStart(anchor.startContainer, anchor.startOffset);
+        range.setEnd(anchor.endContainer, anchor.endOffset);
+        const mark = document.createElement('mark');
+        mark.className = 'rsvp-inline-highlight';
+        range.surroundContents(mark);
+        return mark;
+      } catch(e){
+        return null;
+      }
+    };
+
+    const highlightSlice = (start, count)=>{
+      if(!anchors || !anchors.length) return;
+      const safeStart = Math.max(0, Math.min(start, words.length-1));
+      const end = Math.min(words.length, safeStart + count);
+      clearHighlights();
+      for(let i = safeStart; i < end; i++){
+        const mark = createInlineMark(anchors[i]);
+        if(mark) activeMarks.push(mark);
+      }
+      lastHighlightStart = safeStart;
+    };
 
     const updateProgress = ()=>{
       const ratio = Math.min(1, state.index / words.length);
@@ -343,9 +440,12 @@
       if(state.index >= words.length){
         state.playing = false;
         timer = null;
+        clearHighlights();
         return;
       }
-      const slice = words.slice(state.index, state.index + state.chunk);
+      const startIndex = state.index;
+      const slice = words.slice(startIndex, startIndex + state.chunk);
+      highlightSlice(startIndex, state.chunk);
       renderSlice(slice);
       state.index += state.chunk;
       updateProgress();
@@ -414,6 +514,7 @@
       state.index = 0;
       updateProgress();
       ui.wordBox.textContent = '';
+      clearHighlights();
     };
 
     const next = ()=>{
@@ -428,7 +529,9 @@
       showWord();
     };
 
-    return {play, pause, stop, next, prev, updateProgress};
+    const refreshHighlight = ()=>highlightSlice(lastHighlightStart, state.chunk);
+
+    return {play, pause, stop, next, prev, updateProgress, clearHighlights, refreshHighlight};
   }
 
   // Main initializer
@@ -439,9 +542,19 @@
     const article = document.querySelector(options.selectorOverrides.article || 'article, .post, main, #content');
     if(!article || article.dataset.rsvpBound === 'true') return;
 
-    extractWords(article, options, (rawWords)=>{
+    extractWords(article, options, ({words:rawWords = [], anchors:rawAnchors = []} = {})=>{
       // Expand long words
-      let words = rawWords.flatMap(w=>splitLongWord(w, options));
+      const words = [];
+      const anchors = [];
+
+      rawWords.forEach((w, idx)=>{
+        const parts = splitLongWord(w, options);
+        const anchorRef = rawAnchors && rawAnchors[idx] ? rawAnchors[idx] : null;
+        parts.forEach(p=>{
+          words.push(p);
+          anchors.push(anchorRef);
+        });
+      });
       if(words.length < options.minWords) return;
 
       const commandRatio = computeCommandRatio(article.innerText || '');
@@ -479,7 +592,7 @@
       };
       let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
-      const player = createPlayer(words, state, ui, article, ()=>isPanelOpen);
+      const player = createPlayer(words, state, ui, article, ()=>isPanelOpen, anchors);
       const siteHeader = document.querySelector('.site-header .container-xl') || document.querySelector('.site-header');
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
 
@@ -501,9 +614,11 @@
             ui.warning.style.display = 'block';
           }
           player.updateProgress();
+          player.refreshHighlight();
           (ui.playBtn || ui.panel).focus();
         } else {
           player.pause();
+          player.clearHighlights();
         }
       };
 
