@@ -184,8 +184,10 @@
         resolve(payload);
         return;
       }
+
       processTextNodesInChunks(textNodes, ()=>{
-        payload.words = wordElements.map(el=>el.textContent);
+        // ensure words array exactly matches annotated spans (1:1)
+        payload.words = wordElements.map(el => el.textContent);
         const domTokens = (root.innerText || '').trim().split(/\s+/).filter(Boolean).length;
         console.info('rsvp: annotated words count =', payload.words.length);
         console.info('rsvp: dom tokens =', domTokens);
@@ -496,15 +498,6 @@
       highlighter.highlightRange(startIndex, state.chunk);
       lastStart = startIndex;
       renderSlice(displaySlice);
-      // quick debug highlight by exact text match (temporary)
-      try {
-        const centerText = (displaySlice[Math.floor(displaySlice.length/2)] || '').trim();
-        if(centerText){
-          document.querySelectorAll('.rsvp-inline.rsvp-current').forEach(e => e.classList.remove('rsvp-current'));
-          const match = Array.from(document.querySelectorAll('.rsvp-inline')).find(e => e.textContent.trim() === centerText);
-          if(match) match.classList.add('rsvp-current');
-        }
-      } catch(e){}
       state.index += state.chunk;
       updateProgress();
 
