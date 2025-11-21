@@ -231,22 +231,27 @@
   }
 
   // Highlight RSVP tokens by index without costly DOM rewrites
+  function scrollHighlightedIntoView(el){
+    if(!el) return;
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if(rect.top < 80 || rect.bottom > vh - 80){
+      const offset = rect.top + window.pageYOffset - (vh / 2) + (rect.height / 2);
+      window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+    }
+  }
+
   function makeRsvpHighlighter(elements){
     let prev = [];
-    const scrollIfNeeded = (el)=>{
-      if(!el || typeof el.getBoundingClientRect !== 'function') return;
-      const rect = el.getBoundingClientRect();
-      if(rect.top < 60 || rect.bottom > (window.innerHeight - 60)){
-        el.scrollIntoView({behavior: 'smooth', block: 'center'});
-      }
-    };
-
     return {
       highlightRange(start, count){
-        prev.forEach(idx=>{ const el = elements[idx]; if(el) el.classList.remove('rsvp-current'); });
+        prev.forEach(idx => {
+          const el = elements[idx];
+          if(el) el.classList.remove('rsvp-current');
+        });
         const next = [];
         if(start >= 0 && count > 0){
-          const end = Math.min(elements.length, Math.max(0, start) + count);
+          const end = Math.min(elements.length, start + count);
           for(let i = Math.max(0, start); i < end; i++){
             const el = elements[i];
             if(!el) continue;
@@ -255,13 +260,17 @@
           }
           if(next.length){
             const centerIdx = next[Math.floor(next.length/2)];
-            scrollIfNeeded(elements[centerIdx]);
+            const el = elements[centerIdx];
+            scrollHighlightedIntoView(el);
           }
         }
         prev = next;
       },
       clear(){
-        prev.forEach(idx=>{ const el = elements[idx]; if(el) el.classList.remove('rsvp-current'); });
+        prev.forEach(idx => {
+          const el = elements[idx];
+          if(el) el.classList.remove('rsvp-current');
+        });
         prev = [];
       }
     };
@@ -368,9 +377,12 @@
 
     const screen = document.createElement('div');
     screen.className = 'rsvp-screen';
-    const wordBox = document.createElement('div');
-    wordBox.className = 'rsvp-word';
-    screen.appendChild(wordBox);
+    let wordBox = screen.querySelector('.rsvp-word');
+    if(!wordBox){
+      wordBox = document.createElement('div');
+      wordBox.className = 'rsvp-word';
+      screen.appendChild(wordBox);
+    }
 
     const controls = document.createElement('div');
     controls.className = 'rsvp-controls';
@@ -408,6 +420,16 @@
     panel.append(header, desc, warning, screen, controls);
     container.appendChild(panel);
 
+    // ensure UI wordBox is real element inside .rsvp-screen
+    const screenEl = panel.querySelector('.rsvp-screen') || panel;
+    let ensuredWordBox = screenEl.querySelector('.rsvp-word');
+    if(!ensuredWordBox){
+      ensuredWordBox = document.createElement('div');
+      ensuredWordBox.className = 'rsvp-word';
+      screenEl.appendChild(ensuredWordBox);
+    }
+    wordBox = ensuredWordBox;
+
     return {container, panel, playBtn, wordBox, wpmInput, progressBar, warning};
   }
 
@@ -435,23 +457,26 @@
     };
 
     const renderSlice = (slice)=>{
-      ui.wordBox.textContent = '';
+      const box = ui.wordBox;
+      if(!box) return;
       const target = slice[Math.floor(slice.length/2)] || slice[0] || '';
       const {prefix, pivot, suffix} = formatWord(target);
-      const prefixNode = document.createTextNode(prefix);
+      box.innerHTML = '';
+      box.appendChild(document.createTextNode(prefix));
       const pivotNode = document.createElement('span');
       pivotNode.className = 'orp';
       pivotNode.textContent = pivot;
-      const suffixNode = document.createTextNode(suffix);
-      ui.wordBox.append(prefixNode, pivotNode, suffixNode);
-      if(state.chunk>1){
+      box.appendChild(pivotNode);
+      box.appendChild(document.createTextNode(suffix));
+      if(state.chunk > 1){
         const countSpan = document.createElement('span');
         countSpan.className = 'orp';
         countSpan.style.opacity = '.6';
         countSpan.style.fontSize = '.75em';
         countSpan.style.marginLeft = '.4em';
         countSpan.textContent = `(${slice.length})`;
-        ui.wordBox.append(' ', countSpan);
+        box.appendChild(document.createTextNode(' '));
+        box.appendChild(countSpan);
       }
     };
 
@@ -485,7 +510,9 @@
     };
 
     const showWord = ()=>{
-      console.debug('[RSVP] showWord index:', state.index, 'word:', words[state.index]);
+      if(global && global.rsvpDebug){
+        console.debug('[RSVP] showWord index:', state.index, 'word:', words[state.index]);
+      }
       if(state.index >= words.length){
         state.playing = false;
         timer = null;
@@ -653,12 +680,10 @@
           const domTokens = (diagRoot && diagRoot.innerText ? diagRoot.innerText : '').trim().split(/\s+/).filter(Boolean);
           return {
             spanCount: wordElements.length,
-            first10: words.slice(0, 10),
-            last10: words.slice(-10),
-            compareFirst30: {
-              words: words.slice(0, 30),
-              dom: domTokens.slice(0, 30)
-            }
+            wordsCount: words.length,
+            domTokens: domTokens.length,
+            firstWords: words.slice(0, 20),
+            firstElems: Array.from(wordElements).slice(0, 20).map(e=>e.textContent)
           };
         };
       }
