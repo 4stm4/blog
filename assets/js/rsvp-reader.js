@@ -11,7 +11,7 @@
   // Default configuration values tuned for Russian text and blog layout
   const DEFAULT_OPTIONS = {
     selectorOverrides: {
-      article: 'article, .post, main, #content',
+      article: 'article, .post-content, .post, main, #content',
       title: 'h1'
     },
     defaultWpm: 250,
@@ -36,7 +36,7 @@
     freqMapTimeoutMs: 4000,
     freqMapMaxBytes: 2000000,
     freqMapMaxEntries: 120000,
-    minWords: 120,
+    minWords: 30,
     commandRatioWarn: 0.3,
     idleChunkWords: 20000
   };
@@ -73,8 +73,10 @@
       .rsvp-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;gap:0.75rem;flex-wrap:wrap;}
       .rsvp-header-actions{display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;justify-content:flex-end;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
-      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
-      .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
+      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}    
+      .rsvp-screen .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}    
+      /* inline words inside article must not inherit the panel style */
+      .rsvp-inline{ display:inline; font:inherit; color:inherit; font-weight:inherit; text-shadow:none; }
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
       .rsvp-controls{display:flex;flex-direction:column;gap:0.75rem;align-items:stretch;}
       .rsvp-header .rsvp-wpm{display:flex;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
@@ -91,13 +93,13 @@
       .rsvp-screen + .rsvp-controls{margin-top:0.25rem;}
       .rsvp-inline-highlight{background:rgba(203, 88, 0, 0.28);color:inherit;border-radius:8px;padding:0 0.12em;}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-      .rsvp-word[data-rsvp-index]{display:inline;white-space:pre-wrap;transition:none !important;}
-      .rsvp-word[data-rsvp-index].rsvp-current{background:rgba(203, 88, 0, 0.28);border-radius:6px;padding:0 0.08em;transition:none !important;}
+      .rsvp-inline[data-rsvp-index]{display:inline;white-space:pre-wrap;transition:none !important;}
+      .rsvp-inline[data-rsvp-index].rsvp-current{background:rgba(203, 88, 0, 0.28);border-radius:6px;padding:0 0.08em;transition:none !important;}
     `;
     document.head.appendChild(style);
   }
   // Annotate readable text with indexed spans (single source of truth for RSVP)
-  function annotateArticleForRsvp(rootSelector = 'article, .post, #content, main'){
+  function annotateArticleForRsvp(rootSelector = 'article, .post-content, .post, #content, main'){
     const root = typeof rootSelector === 'string' ? document.querySelector(rootSelector) : rootSelector;
     if(!root) return {words: [], elements: [], root: null, ready: Promise.resolve({words: [], elements: [], root: null})};
     if(root.querySelector('.rsvp-word')){
@@ -107,9 +109,9 @@
       return payload;
     }
 
-    const WORD_RE = supportsUnicodeProps
-      ? /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*(?:[.,!?;:…»«“”„)\]\-—–])?/gu
-      : /[^\s\u00A0]+(?:[.,!?;:…»«“”„)\]\-]|—|–)?/g;
+  const WORD_RE = supportsUnicodeProps
+      ? /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu
+      : new RegExp(`[${FALLBACK_CLASS}]+(?:['’\\-][${FALLBACK_CLASS}]+)*`, 'g');
     const ignoredTags = /^(SCRIPT|STYLE|CODE|PRE|A|BUTTON|INPUT|TEXTAREA)$/i;
     const wordElements = [];
 
@@ -139,20 +141,22 @@
           const frag = document.createDocumentFragment();
           let lastIndex = 0;
           let match;
+
           while((match = WORD_RE.exec(text)) !== null){
             const pre = text.slice(lastIndex, match.index);
             if(pre) frag.appendChild(document.createTextNode(pre));
 
             const token = match[0];
             const span = document.createElement('span');
-            span.className = 'rsvp-word';
+            span.className = 'rsvp-word rsvp-inline';
             span.setAttribute('data-rsvp-index', wordElements.length);
             span.setAttribute('aria-hidden', 'true');
             span.textContent = token;
             frag.appendChild(span);
             wordElements.push(span);
-            lastIndex = match.index + token.length;
+            lastIndex = WORD_RE.lastIndex;
           }
+
           const tail = text.slice(lastIndex);
           if(tail) frag.appendChild(document.createTextNode(tail));
           if(parent) parent.replaceChild(frag, tn);
@@ -566,11 +570,20 @@
 
   // Main initializer
   function initRsvpReader(userOptions={}){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', ()=>initRsvpReader(userOptions), {once:true});
+      return;
+    }
+
     const options = {...DEFAULT_OPTIONS, ...userOptions, selectorOverrides: {...DEFAULT_OPTIONS.selectorOverrides, ...(userOptions.selectorOverrides||{})}};
     injectStyles();
 
-    const article = document.querySelector(options.selectorOverrides.article || 'article, .post, main, #content');
-    if(!article || article.dataset.rsvpBound === 'true') return;
+    const article = document.querySelector(options.selectorOverrides.article || 'article, .post-content, .post, main, #content');
+    if(!article){
+      console.error('RSVP: контейнер статьи не найден');
+      return;
+    }
+    if(article.dataset.rsvpBound === 'true') return;
 
     const annotation = annotateArticleForRsvp(article);
     const proceed = ({words = [], elements: wordElements = [], root})=>{
@@ -690,7 +703,9 @@
     };
 
     if(annotation && annotation.ready && typeof annotation.ready.then === 'function'){
-      annotation.ready.then(proceed);
+      annotation.ready.then(proceed).catch(err=>{
+        console.error('RSVP: annotateArticleForRsvp failed', err);
+      });
     } else {
       proceed(annotation || {});
     }
@@ -723,10 +738,10 @@
   // 2) Вызовите: initRsvpReader({ selectorOverrides: { article: 'article', title: 'h1' }, defaultWpm: 350, adaptive: true });
   // 3) Кнопка появится возле заголовка статьи, панель раскрывается по клику.
   
-  // Список селекторов 4stm4.ru: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
+  // Список селекторов 4stm4.ru: article, .post-content, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
   // Консольные проверки в DevTools:
   // console.log('rsvp words:', window.rsvp?.words?.length ?? 'no rsvp object');
-  // console.log('dom word count:', document.querySelector('article, .post, #content, main').innerText.trim().split(/\s+/).length);
+  // console.log('dom word count:', document.querySelector('article, .post-content, .post, #content, main').innerText.trim().split(/\s+/).length);
   // window._rsvp_diagnostics();
 
 })(typeof window !== 'undefined' ? window : globalThis);
