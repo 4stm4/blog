@@ -91,110 +91,105 @@
       .rsvp-screen + .rsvp-controls{margin-top:0.25rem;}
       .rsvp-inline-highlight{background:rgba(203, 88, 0, 0.28);color:inherit;border-radius:8px;padding:0 0.12em;}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+      .rsvp-word[data-rsvp-index]{display:inline;white-space:pre-wrap;transition:none !important;}
+      .rsvp-word[data-rsvp-index].rsvp-current{background:rgba(203, 88, 0, 0.28);border-radius:6px;padding:0 0.08em;transition:none !important;}
     `;
     document.head.appendChild(style);
   }
-  // Utility: find closest ancestor matching any selector
-  function isInside(element, selectors){
-    if (!element) return false;
-    return element.closest(selectors);
-  }
+  // Annotate readable text with indexed spans (single source of truth for RSVP)
+  function annotateArticleForRsvp(rootSelector = 'article, .post, #content, main'){
+    const root = typeof rootSelector === 'string' ? document.querySelector(rootSelector) : rootSelector;
+    if(!root) return {words: [], elements: [], root: null, ready: Promise.resolve({words: [], elements: [], root: null})};
+    if(root.querySelector('.rsvp-word')){
+      const existing = Array.from(root.querySelectorAll('.rsvp-word'));
+      const payload = {words: existing.map(el=>el.textContent), elements: existing, root};
+      payload.ready = Promise.resolve(payload);
+      return payload;
+    }
 
-  // Extract readable text nodes respecting exclusions
-  function extractWords(container, options, done){
-    const allowed = Array.from(container.querySelectorAll('p, h2, h3, h4, li, blockquote, pre, code'));
-    const words = [];
-    const anchors = [];
-    const skipSelectors = 'table, .commands, .cli, [data-no-rsvp="true"]';
-    const collectTextNodes = (el)=>{
-      const nodes = [];
-      let offset = 0;
-      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
-        acceptNode(node){
-          return node.nodeValue && node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    const WORD_RE = supportsUnicodeProps
+      ? /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*(?:[.,!?;:…»«“”„)\]\-—–])?/gu
+      : /[^\s\u00A0]+(?:[.,!?;:…»«“”„)\]\-]|—|–)?/g;
+    const ignoredTags = /^(SCRIPT|STYLE|CODE|PRE|A|BUTTON|INPUT|TEXTAREA)$/i;
+    const wordElements = [];
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        const p = node.parentElement;
+        if(!p || ignoredTags.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+        if(p.closest('[data-no-rsvp="true"], table, .commands, .cli')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const textNodes = [];
+    while(walker.nextNode()){
+      textNodes.push(walker.currentNode);
+    }
+
+    const processTextNodesInChunks = (nodes, onDone)=>{
+      let i = 0;
+      const chunk = ()=>{
+        const end = Math.min(nodes.length, i + 50);
+        for(; i < end; i++){
+          const tn = nodes[i];
+          const text = tn.nodeValue;
+          const parent = tn.parentNode;
+          const frag = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while((match = WORD_RE.exec(text)) !== null){
+            const pre = text.slice(lastIndex, match.index);
+            if(pre) frag.appendChild(document.createTextNode(pre));
+
+            const token = match[0];
+            const span = document.createElement('span');
+            span.className = 'rsvp-word';
+            span.setAttribute('data-rsvp-index', wordElements.length);
+            span.setAttribute('aria-hidden', 'true');
+            span.textContent = token;
+            frag.appendChild(span);
+            wordElements.push(span);
+            lastIndex = match.index + token.length;
+          }
+          const tail = text.slice(lastIndex);
+          if(tail) frag.appendChild(document.createTextNode(tail));
+          if(parent) parent.replaceChild(frag, tn);
         }
+        if(i < nodes.length){
+          if(typeof global.requestIdleCallback === 'function'){
+            global.requestIdleCallback(chunk, {timeout:200});
+          } else {
+            setTimeout(chunk, 16);
+          }
+        } else {
+          onDone();
+        }
+      };
+      chunk();
+    };
+
+    const payload = {words: [], elements: wordElements, root, ready: null};
+    payload.ready = new Promise(resolve=>{
+      if(!textNodes.length){
+        const domTokens = (root.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+        console.info('rsvp: annotated words count =', 0);
+        console.info('rsvp: dom tokens =', domTokens);
+        payload.words = [];
+        resolve(payload);
+        return;
+      }
+      processTextNodesInChunks(textNodes, ()=>{
+        payload.words = wordElements.map(el=>el.textContent);
+        const domTokens = (root.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+        console.info('rsvp: annotated words count =', payload.words.length);
+        console.info('rsvp: dom tokens =', domTokens);
+        resolve(payload);
       });
-      let current;
-      while((current = walker.nextNode())){
-        nodes.push({node: current, start: offset, end: offset + current.nodeValue.length});
-        offset += current.nodeValue.length;
-      }
-      return nodes;
-    };
+    });
 
-    const anchorRange = (textNodes, start, end)=>{
-      let startNode = null;
-      let startOffset = 0;
-      let endNode = null;
-      let endOffset = 0;
-      for(const info of textNodes){
-        if(!startNode && start < info.end){
-          startNode = info.node;
-          startOffset = Math.max(0, start - info.start);
-        }
-        if(startNode && end <= info.end){
-          endNode = info.node;
-          endOffset = Math.max(0, end - info.start);
-          break;
-        }
-      }
-
-      // Fallback: if exact nodes were not resolved (for example when markup
-      // nesting splits the word), try to highlight the closest available text
-      // node so that inline selection still appears instead of silently
-      // failing.
-      if(!startNode || !endNode){
-        const first = textNodes[0];
-        if(first){
-          const fallback = document.createRange();
-          fallback.selectNodeContents(first.node);
-          return fallback;
-        }
-        return null;
-      }
-
-      const range = document.createRange();
-      range.setStart(startNode, startOffset);
-      range.setEnd(endNode, endOffset);
-      return range;
-    };
-
-    const pushWithAnchors = (el)=>{
-      const rawText = el.textContent || '';
-      const cleaned = rawText.replace(/\s+/g,' ').trim();
-      if(!cleaned) return;
-      // drop footer-like phrases
-      if(/понравилась статья|поделиться|рассылка/i.test(cleaned)) return;
-
-      const textNodes = collectTextNodes(el);
-      for(const match of rawText.matchAll(/\S+/g)){
-        words.push(match[0]);
-        const range = anchorRange(textNodes, match.index, match.index + match[0].length);
-        anchors.push(range ? {
-          startContainer: range.startContainer,
-          startOffset: range.startOffset,
-          endContainer: range.endContainer,
-          endOffset: range.endOffset
-        } : null);
-      }
-    };
-
-    // Process in idle chunks for huge posts
-    let index = 0;
-    const processChunk = ()=>{
-      const end = Math.min(allowed.length, index + 50);
-      for(; index < end; index++){
-        const el = allowed[index];
-        if(isInside(el, skipSelectors)) continue;
-        pushWithAnchors(el);
-      }
-      if(index < allowed.length){
-        ric(processChunk);
-      } else {
-        done({words, anchors});
-      }
-    };
-    processChunk();
+    return payload;
   }
 
   // Heuristic for command heavy content
@@ -227,6 +222,43 @@
       multiplier *= Math.max(0.6, 1 - Math.min(freq/10000, 0.35));
     }
     return multiplier;
+  }
+
+  // Highlight RSVP tokens by index without costly DOM rewrites
+  function makeRsvpHighlighter(elements){
+    let prev = [];
+    const scrollIfNeeded = (el)=>{
+      if(!el || typeof el.getBoundingClientRect !== 'function') return;
+      const rect = el.getBoundingClientRect();
+      if(rect.top < 60 || rect.bottom > (window.innerHeight - 60)){
+        el.scrollIntoView({behavior: 'smooth', block: 'center'});
+      }
+    };
+
+    return {
+      highlightRange(start, count){
+        prev.forEach(idx=>{ const el = elements[idx]; if(el) el.classList.remove('rsvp-current'); });
+        const next = [];
+        if(start >= 0 && count > 0){
+          const end = Math.min(elements.length, Math.max(0, start) + count);
+          for(let i = Math.max(0, start); i < end; i++){
+            const el = elements[i];
+            if(!el) continue;
+            el.classList.add('rsvp-current');
+            next.push(i);
+          }
+          if(next.length){
+            const centerIdx = next[Math.floor(next.length/2)];
+            scrollIfNeeded(elements[centerIdx]);
+          }
+        }
+        prev = next;
+      },
+      clear(){
+        prev.forEach(idx=>{ const el = elements[idx]; if(el) el.classList.remove('rsvp-current'); });
+        prev = [];
+      }
+    };
   }
 
   // Smoothly sync the scroll position of the article with RSVP progress
@@ -374,59 +406,16 @@
   }
 
   // Runner that handles scheduling
-  function createPlayer(words, state, ui, article, isPanelOpen, anchors){
+  function createPlayer(words, wordElements, state, ui, article, isPanelOpen){
     let timer = null;
     const freqMapHolder = {data:null, loaded:false};
-    let lastHighlightStart = 0;
-    let activeMarks = [];
+    let plannedElapsed = 0;
+    let startTs = 0;
+    let lastStart = 0;
 
-    const removeMark = (mark)=>{
-      if(!mark || !mark.parentNode) return;
-      const parent = mark.parentNode;
-      while(mark.firstChild){
-        parent.insertBefore(mark.firstChild, mark);
-      }
-      parent.removeChild(mark);
-    };
+    const highlighter = makeRsvpHighlighter(wordElements);
 
-    const clearHighlights = ()=>{
-      if(!activeMarks.length) return;
-      activeMarks.forEach(removeMark);
-      activeMarks = [];
-    };
-
-    const createInlineMark = (anchor)=>{
-      if(!anchor || !anchor.startContainer || !anchor.endContainer) return null;
-      try {
-        const range = document.createRange();
-        range.setStart(anchor.startContainer, anchor.startOffset);
-        range.setEnd(anchor.endContainer, anchor.endOffset);
-        const mark = document.createElement('mark');
-        mark.className = 'rsvp-inline-highlight';
-
-        // `surroundContents` throws when the selection spans complex markup
-        // (e.g. nested links or inline code). Extracting the contents keeps
-        // highlights stable while preserving the original nodes for unwrapping.
-        const contents = range.extractContents();
-        mark.appendChild(contents);
-        range.insertNode(mark);
-        return mark;
-      } catch(e){
-        return null;
-      }
-    };
-
-    const highlightSlice = (start, count)=>{
-      if(!anchors || !anchors.length) return;
-      const safeStart = Math.max(0, Math.min(start, words.length-1));
-      const end = Math.min(words.length, safeStart + count);
-      clearHighlights();
-      for(let i = safeStart; i < end; i++){
-        const mark = createInlineMark(anchors[i]);
-        if(mark) activeMarks.push(mark);
-      }
-      lastHighlightStart = safeStart;
-    };
+    const clearHighlights = ()=>highlighter && highlighter.clear();
 
     const updateProgress = ()=>{
       const midpointOffset = Math.max(0, state.chunk - 1) / 2;
@@ -460,6 +449,35 @@
       }
     };
 
+    const computeWordDuration = (word, wordIndex)=>{
+      if(typeof state.wordDuration === 'function'){
+        const custom = state.wordDuration(word, wordIndex, state);
+        return Math.max(state.minDelayMs || 0, Number.isFinite(custom) ? custom : 0);
+      }
+      const baseMs = 60000 / state.wpm;
+      if(!state.adaptive) return Math.max(state.minDelayMs || 0, baseMs);
+      let factor = 1;
+      const clean = cleanForTiming(word);
+      if(clean.length > state.lenThreshold){
+        factor += (clean.length - state.lenThreshold) * state.lenFactorPerChar;
+      }
+      if(/[.?!…]$/.test(clean)) factor *= state.punctuationFactors.strong;
+      else if(/[,:;]$/.test(clean)) factor *= state.punctuationFactors.medium;
+      const punctuationBonus = /[.?!…]$/.test(clean) ? 180 : /[,:;]$/.test(clean) ? 110 : 0;
+      factor *= lexicalComplexity(clean, state, freqMapHolder.data);
+      const duration = Math.max(state.minDelayMs || 0, baseMs * factor + punctuationBonus);
+      return duration;
+    };
+
+    const chunkDuration = (startIndex)=>{
+      let total = 0;
+      const end = Math.min(words.length, startIndex + state.chunk);
+      for(let i = startIndex; i < end; i++){
+        total += computeWordDuration(words[i], i);
+      }
+      return total;
+    };
+
     const showWord = ()=>{
       if(state.index >= words.length){
         state.playing = false;
@@ -469,34 +487,19 @@
       }
       const startIndex = state.index;
       const slice = words.slice(startIndex, startIndex + state.chunk);
-      highlightSlice(startIndex, state.chunk);
-      renderSlice(slice);
+      const displaySlice = state.splitLongWords ? slice.flatMap(w=>splitLongWord(w, state)) : slice;
+      highlighter.highlightRange(startIndex, state.chunk);
+      lastStart = startIndex;
+      renderSlice(displaySlice);
       state.index += state.chunk;
       updateProgress();
 
       if(state.playing){
-        const delay = computeDelay(slice, state, freqMapHolder.data);
+        plannedElapsed += chunkDuration(startIndex);
+        const target = startTs + plannedElapsed;
+        const delay = Math.max(0, target - performance.now());
         timer = setTimeout(showWord, delay);
       }
-    };
-
-    const computeDelay = (chunkWords, st, freqMap)=>{
-      const baseMs = (60000 / st.wpm) * Math.max(1, chunkWords.length);
-      if(!st.adaptive) return baseMs;
-      // use max multiplier in chunk to stay safe
-      const multipliers = chunkWords.map(w=>{
-        let factor = 1;
-        const clean = cleanForTiming(w);
-        if(clean.length > st.lenThreshold){
-          factor += (clean.length - st.lenThreshold) * st.lenFactorPerChar;
-        }
-        if(/[.?!]$/.test(clean)) factor *= st.punctuationFactors.strong;
-        else if(/[,:;]$/.test(clean)) factor *= st.punctuationFactors.medium;
-        factor *= lexicalComplexity(clean, st, freqMap);
-        return factor;
-      });
-      const adaptiveMs = baseMs * Math.max(...multipliers);
-      return Math.max(st.minDelayMs || 0, adaptiveMs);
     };
 
     const play = ()=>{
@@ -508,6 +511,8 @@
         return;
       }
       state.playing = true;
+      plannedElapsed = 0;
+      startTs = performance.now();
       if(!freqMapHolder.loaded && state.enableFreqMap){
         freqMapHolder.loaded = true;
         const controller = new AbortController();
@@ -554,7 +559,7 @@
       showWord();
     };
 
-    const refreshHighlight = ()=>highlightSlice(lastHighlightStart, state.chunk);
+    const refreshHighlight = ()=>highlighter.highlightRange(lastStart, state.chunk);
 
     return {play, pause, stop, next, prev, updateProgress, clearHighlights, refreshHighlight};
   }
@@ -567,19 +572,8 @@
     const article = document.querySelector(options.selectorOverrides.article || 'article, .post, main, #content');
     if(!article || article.dataset.rsvpBound === 'true') return;
 
-    extractWords(article, options, ({words:rawWords = [], anchors:rawAnchors = []} = {})=>{
-      // Expand long words
-      const words = [];
-      const anchors = [];
-
-      rawWords.forEach((w, idx)=>{
-        const parts = splitLongWord(w, options);
-        const anchorRef = rawAnchors && rawAnchors[idx] ? rawAnchors[idx] : null;
-        parts.forEach(p=>{
-          words.push(p);
-          anchors.push(anchorRef);
-        });
-      });
+    const annotation = annotateArticleForRsvp(article);
+    const proceed = ({words = [], elements: wordElements = [], root})=>{
       if(words.length < options.minWords) return;
 
       const commandRatio = computeCommandRatio(article.innerText || '');
@@ -611,6 +605,8 @@
         lexicalHyphenWeight: options.lexicalHyphenWeight,
         lexicalLengthWeight: options.lexicalLengthWeight,
         minDelayMs: options.minDelayMs,
+        splitLongWords: options.splitLongWords,
+        wordDuration: options.wordDuration,
         freqMapUrl: options.freqMapUrl,
         enableFreqMap: options.enableFreqMap,
         freqMapTimeoutMs: options.freqMapTimeoutMs,
@@ -619,9 +615,26 @@
       };
       let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
-      const player = createPlayer(words, state, ui, article, ()=>isPanelOpen, anchors);
+      const player = createPlayer(words, wordElements, state, ui, article, ()=>isPanelOpen);
+      const diagRoot = root || article;
       const siteHeader = document.querySelector('.site-header .container-xl') || document.querySelector('.site-header');
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
+
+      if(typeof window !== 'undefined'){
+        window.rsvp = {words, elements: wordElements, state, player};
+        window._rsvp_diagnostics = ()=>{
+          const domTokens = (diagRoot && diagRoot.innerText ? diagRoot.innerText : '').trim().split(/\s+/).filter(Boolean);
+          return {
+            spanCount: wordElements.length,
+            first10: words.slice(0, 10),
+            last10: words.slice(-10),
+            compareFirst30: {
+              words: words.slice(0, 30),
+              dom: domTokens.slice(0, 30)
+            }
+          };
+        };
+      }
 
       if(siteHeader){
         siteHeader.appendChild(ui.container);
@@ -674,7 +687,13 @@
         setPanelVisibility(true);
         player.play();
       }
-    });
+    };
+
+    if(annotation && annotation.ready && typeof annotation.ready.then === 'function'){
+      annotation.ready.then(proceed);
+    } else {
+      proceed(annotation || {});
+    }
   }
 
   // Export for ESM and global usage
@@ -703,8 +722,12 @@
   // 1) Подключите: <script src="/assets/js/rsvp-reader.js" defer></script>
   // 2) Вызовите: initRsvpReader({ selectorOverrides: { article: 'article', title: 'h1' }, defaultWpm: 350, adaptive: true });
   // 3) Кнопка появится возле заголовка статьи, панель раскрывается по клику.
-
+  
   // Список селекторов 4stm4.ru: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
+  // Консольные проверки в DevTools:
+  // console.log('rsvp words:', window.rsvp?.words?.length ?? 'no rsvp object');
+  // console.log('dom word count:', document.querySelector('article, .post, #content, main').innerText.trim().split(/\s+/).length);
+  // window._rsvp_diagnostics();
 
 })(typeof window !== 'undefined' ? window : globalThis);
 
