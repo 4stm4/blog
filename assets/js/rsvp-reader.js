@@ -58,7 +58,7 @@
   // Fallback character class includes Latin, Cyrillic, and common CJK ranges
   const FALLBACK_CLASS = 'A-Za-zА-Яа-яЁё0-9\\u3040-\\u30ff\\u3400-\\u4dbf\\u4e00-\\u9fff\\uac00-\\ud7af';
 
-  // Injects minimal CSS for modal and button. Keeps it scoped with prefixes to avoid collisions.
+  // Injects minimal CSS for inline panel and toggle button. Keeps it scoped with prefixes to avoid collisions.
   function injectStyles(){
     if (document.getElementById('rsvp-reader-style')) return;
     const style = document.createElement('style');
@@ -66,13 +66,11 @@
     style.textContent = `
       .rsvp-toggle{margin-left:0.5rem;padding:0.35rem 0.65rem;border-radius:10px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-light, #242f29);color:var(--text-color, #d1d0c5);font-size:0.9rem;cursor:pointer;transition:all .2s ease;box-shadow:0 6px 18px rgba(4, 17, 12, 0.24);}
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
-      .rsvp-layer-host{position:relative;isolation:isolate;}
-      .rsvp-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2147483000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:1.5rem 0;}
-      .rsvp-backdrop.active{opacity:1;pointer-events:all;}
-      .rsvp-modal{background:linear-gradient(160deg, var(--bg-color-light, #111a15), var(--bg-color, #060c09));color:var(--text-color, #d1d0c5);min-width: min(90vw,720px);max-width: min(95vw,900px);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 20px 45px rgba(3, 8, 5, 0.55));border:1px solid rgba(122, 191, 157, 0.12);position:relative;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
+      .rsvp-container{margin:1rem 0 1.5rem;}
+      .rsvp-panel{background:linear-gradient(160deg, var(--bg-color-light, #111a15), var(--bg-color, #060c09));color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 14px 35px rgba(3, 8, 5, 0.4));border:1px solid rgba(122, 191, 157, 0.12);font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
       .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
-      .rsvp-close{background:none;border:1px solid transparent;color:var(--muted-color, rgba(209, 208, 197, 0.7));font-size:1.3rem;cursor:pointer;border-radius:12px;padding:0.2rem 0.4rem;transition:all .2s ease;}
+      .rsvp-close{background:none;border:1px solid transparent;color:var(--muted-color, rgba(209, 208, 197, 0.7));font-size:0.9rem;cursor:pointer;border-radius:12px;padding:0.35rem 0.55rem;transition:all .2s ease;}
       .rsvp-close:hover{color:var(--select-color, #cb5800);border-color:rgba(203, 88, 0, 0.35);background:rgba(203, 88, 0, 0.08);}
       .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
       .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
@@ -92,7 +90,6 @@
     `;
     document.head.appendChild(style);
   }
-
   // Utility: find closest ancestor matching any selector
   function isInside(element, selectors){
     if (!element) return false;
@@ -204,42 +201,37 @@
     };
   }
 
-  // Modal builder
-  function buildModal(state, idBase){
+  // Inline panel builder
+  function buildPanel(state, idBase){
     const titleId = `${idBase}-title`;
     const descId = `${idBase}-desc`;
-    const backdrop = document.createElement('div');
-    backdrop.className = 'rsvp-backdrop';
-    backdrop.setAttribute('aria-hidden','true');
 
-    const modal = document.createElement('div');
-    modal.className = 'rsvp-modal';
-    modal.setAttribute('role','dialog');
-    modal.setAttribute('aria-modal','true');
-    modal.setAttribute('aria-label','Скорочтение');
-    modal.tabIndex = -1; // make focusable for programmatic focus()
+    const container = document.createElement('div');
+    container.className = 'rsvp-container';
+    container.hidden = true;
 
-    const srReturn = document.createElement('div');
-    srReturn.className = 'sr-only';
-    srReturn.tabIndex = 0;
-    srReturn.textContent = 'Начало диалога скорочтения';
+    const panel = document.createElement('div');
+    panel.className = 'rsvp-panel';
+    panel.setAttribute('role','group');
+    panel.setAttribute('aria-label','Скорочтение');
 
     const header = document.createElement('div');
     header.className = 'rsvp-header';
     const title = document.createElement('h2');
     title.id = titleId;
     title.textContent = 'Скорочтение';
-    modal.setAttribute('aria-labelledby', title.id);
+    panel.setAttribute('aria-labelledby', title.id);
 
     const desc = document.createElement('p');
     desc.id = descId;
     desc.className = 'sr-only';
-    desc.textContent = 'Пробел — play/pause, стрелки — prev/next, Esc — закрыть.';
-    modal.setAttribute('aria-describedby', desc.id);
+    desc.textContent = 'Пробел — play/pause, стрелки — prev/next.';
+    panel.setAttribute('aria-describedby', desc.id);
     const closeBtn = document.createElement('button');
     closeBtn.className = 'rsvp-close';
-    closeBtn.innerHTML = '&times;';
-    closeBtn.title = 'Закрыть (Esc)';
+    closeBtn.type = 'button';
+    closeBtn.textContent = 'Свернуть';
+    closeBtn.title = 'Скрыть панель';
     header.append(title, closeBtn);
 
     const warning = document.createElement('div');
@@ -284,10 +276,10 @@
 
     controls.append(progressWrap, controlRow);
 
-    modal.append(srReturn, header, desc, warning, screen, controls);
-    backdrop.appendChild(modal);
+    panel.append(header, desc, warning, screen, controls);
+    container.appendChild(panel);
 
-    return {backdrop, modal, closeBtn, playBtn, wordBox, wpmInput, progressBar, warning};
+    return {container, panel, closeBtn, playBtn, wordBox, wpmInput, progressBar, warning};
   }
 
   // Runner that handles scheduling
@@ -435,7 +427,8 @@
       const toggle = document.createElement('button');
       toggle.className = 'rsvp-toggle';
       toggle.type = 'button';
-      toggle.title = 'Скорочтение (RSVP) — показать модальное окно';
+      toggle.title = 'Скорочтение (RSVP) — показать панель';
+      toggle.setAttribute('aria-expanded','false');
       toggle.textContent = 'Скорочтение';
       titleEl.parentNode.insertBefore(toggle, titleEl.nextSibling);
       article.dataset.rsvpBound = 'true';
@@ -458,98 +451,51 @@
         freqMapMaxBytes: options.freqMapMaxBytes,
         freqMapMaxEntries: options.freqMapMaxEntries
       };
-      const ui = buildModal(state, uniqueId('rsvp-modal'));
+      const ui = buildPanel(state, uniqueId('rsvp-panel'));
       const player = createPlayer(words, state, ui);
-      let lastFocused = null;
-      const backgroundContainer = article.closest('main, #content') || article.closest('body') || article;
-      const layerHost = article.closest('.container-xl') || backgroundContainer || document.body;
-      if(layerHost && !layerHost.classList.contains('rsvp-layer-host')){
-        layerHost.classList.add('rsvp-layer-host');
+      const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
+      if(headerEl && headerEl.parentNode){
+        headerEl.parentNode.insertBefore(ui.container, headerEl.nextSibling);
+      } else {
+        article.insertBefore(ui.container, article.firstChild);
       }
-      let isModalOpen = false;
-      let inertApplied = false;
-      let prevPointer = '';
-      let prevInert = false;
+      let isPanelOpen = false;
 
-      const openModal = ()=>{
-        if(isModalOpen) return;
-        lastFocused = document.activeElement;
-        (layerHost || document.body).appendChild(ui.backdrop);
-        setTimeout(()=>ui.backdrop.classList.add('active'), 10);
-        ui.backdrop.setAttribute('aria-hidden','false');
-        isModalOpen = true;
-        // Prefer focusing the first actionable control for keyboard users
-        (ui.playBtn || ui.modal).focus();
-        // hide background content from screen readers
-        try { backgroundContainer.setAttribute('aria-hidden','true'); } catch(e){/*noop*/ }
-        if(backgroundContainer){
-          if('inert' in backgroundContainer){
-            prevInert = backgroundContainer.inert;
-            backgroundContainer.inert = true;
-            inertApplied = true;
-          } else {
-            prevPointer = backgroundContainer.style.pointerEvents;
-            backgroundContainer.style.pointerEvents = 'none';
-            inertApplied = true;
+      const setPanelVisibility = (open)=>{
+        isPanelOpen = open;
+        ui.container.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.textContent = open ? 'Скрыть скорочтение' : 'Скорочтение';
+        if(open){
+          if(commandRatio > options.commandRatioWarn){
+            ui.warning.style.display = 'block';
           }
+          player.updateProgress();
+          (ui.playBtn || ui.panel).focus();
+        } else {
+          player.pause();
         }
-        if(commandRatio > options.commandRatioWarn){
-          ui.warning.style.display = 'block';
-        }
-        player.updateProgress();
-        document.addEventListener('keydown', keyHandler);
-      };
-
-      const closeModal = ()=>{
-        if(!isModalOpen) return;
-        player.pause();
-        ui.backdrop.classList.remove('active');
-        ui.backdrop.setAttribute('aria-hidden','true');
-        setTimeout(()=>{
-          if(ui.backdrop.parentNode) ui.backdrop.parentNode.removeChild(ui.backdrop);
-        }, 200);
-        document.removeEventListener('keydown', keyHandler);
-        try { backgroundContainer.removeAttribute('aria-hidden'); } catch(e){/*noop*/ }
-        if(inertApplied && backgroundContainer){
-          if('inert' in backgroundContainer){
-            backgroundContainer.inert = prevInert;
-          } else {
-            backgroundContainer.style.pointerEvents = prevPointer;
-          }
-          inertApplied = false;
-        }
-        isModalOpen = false;
-        if(lastFocused && lastFocused.focus) lastFocused.focus();
       };
 
       const keyHandler = (e)=>{
-        if(!isModalOpen) return;
-        const focusable = Array.from(ui.modal.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')).filter(el=>!el.disabled);
-        const focusInside = ui.modal.contains(document.activeElement);
-        if((e.key === 'Escape' || e.key === 'Esc' || e.code === 'Escape')){ closeModal(); }
-        else if(e.key === 'Tab'){
-          if(!focusable.length) return;
-          const first = focusable[0];
-          const last = focusable[focusable.length-1];
-          if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-          else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-        }
-        else if((e.code === 'Space' || e.key === ' ') && focusInside){ e.preventDefault(); player.play(); }
+        if(!isPanelOpen) return;
+        const focusInside = ui.panel.contains(document.activeElement);
+        if((e.code === 'Space' || e.key === ' ') && focusInside){ e.preventDefault(); player.play(); }
         else if(e.key === 'ArrowRight' && focusInside){ e.preventDefault(); player.next(); }
         else if(e.key === 'ArrowLeft' && focusInside){ e.preventDefault(); player.prev(); }
       };
 
       // Wiring UI controls
-      toggle.addEventListener('click', openModal);
-      ui.closeBtn.addEventListener('click', closeModal);
-      ui.backdrop.addEventListener('click', (e)=>{ if(e.target === ui.backdrop) closeModal(); });
+      toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
+      ui.closeBtn.addEventListener('click', ()=>setPanelVisibility(false));
       ui.playBtn.addEventListener('click', ()=>player.play());
       ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
+      ui.panel.addEventListener('keydown', keyHandler);
 
       // Simple demo mode for localhost or data attribute
       if(location.hostname === 'localhost' || document.body.dataset.demo === 'rsvp'){
         console.info('[RSVP] Demo mode enabled');
-        openModal();
+        setPanelVisibility(true);
         player.play();
       }
     });
@@ -580,7 +526,7 @@
   // README (3 строки)
   // 1) Подключите: <script src="/assets/js/rsvp-reader.js" defer></script>
   // 2) Вызовите: initRsvpReader({ selectorOverrides: { article: 'article', title: 'h1' }, defaultWpm: 350, adaptive: true });
-  // 3) Кнопка появится возле заголовка статьи, модал открывается по клику.
+  // 3) Кнопка появится возле заголовка статьи, панель раскрывается по клику.
 
   // Список селекторов 4stm4.ru: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
 
