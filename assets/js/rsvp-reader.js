@@ -67,11 +67,9 @@
       .rsvp-toggle{margin-left:0.5rem;padding:0.35rem 0.65rem;border-radius:10px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-light, #242f29);color:var(--text-color, #d1d0c5);font-size:0.9rem;cursor:pointer;transition:all .2s ease;box-shadow:0 6px 18px rgba(4, 17, 12, 0.24);}
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
       .rsvp-container{margin:1rem 0 1.5rem;}
-      .rsvp-panel{background:linear-gradient(160deg, var(--bg-color-light, #111a15), var(--bg-color, #060c09));color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 14px 35px rgba(3, 8, 5, 0.4));border:1px solid rgba(122, 191, 157, 0.12);font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
+      .rsvp-panel{background:var(--bg-color, #060c09);color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 14px 35px rgba(3, 8, 5, 0.4));font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
       .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
-      .rsvp-close{background:none;border:1px solid transparent;color:var(--muted-color, rgba(209, 208, 197, 0.7));font-size:0.9rem;cursor:pointer;border-radius:12px;padding:0.35rem 0.55rem;transition:all .2s ease;}
-      .rsvp-close:hover{color:var(--select-color, #cb5800);border-color:rgba(203, 88, 0, 0.35);background:rgba(203, 88, 0, 0.08);}
       .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
       .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
@@ -227,12 +225,7 @@
     desc.className = 'sr-only';
     desc.textContent = 'Пробел — play/pause, стрелки — prev/next.';
     panel.setAttribute('aria-describedby', desc.id);
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'rsvp-close';
-    closeBtn.type = 'button';
-    closeBtn.textContent = 'Свернуть';
-    closeBtn.title = 'Скрыть панель';
-    header.append(title, closeBtn);
+    header.append(title);
 
     const warning = document.createElement('div');
     warning.className = 'rsvp-warning';
@@ -279,7 +272,7 @@
     panel.append(header, desc, warning, screen, controls);
     container.appendChild(panel);
 
-    return {container, panel, closeBtn, playBtn, wordBox, wpmInput, progressBar, warning};
+    return {container, panel, playBtn, wordBox, wpmInput, progressBar, warning};
   }
 
   // Runner that handles scheduling
@@ -487,7 +480,6 @@
 
       // Wiring UI controls
       toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
-      ui.closeBtn.addEventListener('click', ()=>setPanelVisibility(false));
       ui.playBtn.addEventListener('click', ()=>player.play());
       ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
       ui.panel.addEventListener('keydown', keyHandler);
