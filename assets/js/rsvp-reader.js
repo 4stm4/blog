@@ -67,7 +67,7 @@
       .rsvp-toggle{margin-left:0.5rem;padding:0.35rem 0.65rem;border-radius:10px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-light, #242f29);color:var(--text-color, #d1d0c5);font-size:0.9rem;cursor:pointer;transition:all .2s ease;box-shadow:0 6px 18px rgba(4, 17, 12, 0.24);}
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
       .rsvp-container{margin:1rem 0 1.5rem;}
-      .rsvp-panel{background:var(--bg-color, #060c09);color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 14px 35px rgba(3, 8, 5, 0.4));font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
+      .rsvp-panel{background:#111a15;color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
       .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
       .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
