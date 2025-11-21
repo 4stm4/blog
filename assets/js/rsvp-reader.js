@@ -73,18 +73,20 @@
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
       .rsvp-close{background:none;border:1px solid transparent;color:var(--muted-color, rgba(209, 208, 197, 0.7));font-size:1.3rem;cursor:pointer;border-radius:12px;padding:0.2rem 0.4rem;transition:all .2s ease;}
       .rsvp-close:hover{color:var(--select-color, #cb5800);border-color:rgba(203, 88, 0, 0.35);background:rgba(203, 88, 0, 0.08);}
-      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
+      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
       .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
-      .rsvp-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem;align-items:center;}
-      .rsvp-controls label{display:flex;flex-direction:column;font-size:0.85rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.25rem;}
+      .rsvp-controls{display:flex;flex-direction:column;gap:0.75rem;align-items:stretch;}
+      .rsvp-control-row{display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;}
+      .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
       .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
       .rsvp-btn{padding:0.45rem 0.65rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-bright, #3a4a41);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;}
       .rsvp-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
       .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
+      .rsvp-screen + .rsvp-controls .rsvp-progress{width:100%;}
+      .rsvp-screen + .rsvp-controls{margin-top:0.25rem;}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
     `;
     document.head.appendChild(style);
@@ -253,21 +255,20 @@
     const controls = document.createElement('div');
     controls.className = 'rsvp-controls';
 
+    const progressWrap = document.createElement('div');
+    progressWrap.className = 'rsvp-progress';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'rsvp-progress-bar';
+    progressWrap.appendChild(progressBar);
+
     const playBtn = document.createElement('button');
     playBtn.className = 'rsvp-btn';
     playBtn.textContent = 'Play / Pause';
     playBtn.title = 'Пробел — воспроизведение/пауза';
 
-    const stopBtn = document.createElement('button');
-    stopBtn.className = 'rsvp-btn';
-    stopBtn.textContent = 'Stop';
-
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'rsvp-btn';
-    prevBtn.textContent = 'Prev (←)';
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'rsvp-btn';
-    nextBtn.textContent = 'Next (→)';
+    const controlRow = document.createElement('div');
+    controlRow.className = 'rsvp-control-row';
+    controlRow.appendChild(playBtn);
 
     const wpmLabel = document.createElement('label');
     wpmLabel.textContent = 'WPM';
@@ -275,50 +276,17 @@
     wpmInput.type = 'number';
     wpmInput.min = '100';
     wpmInput.max = '1200';
+    wpmInput.step = '25';
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
+    controlRow.appendChild(wpmLabel);
 
-    const chunkLabel = document.createElement('label');
-    chunkLabel.textContent = 'Chunk size (слов за тик)';
-    const chunkInput = document.createElement('input');
-    chunkInput.type = 'number';
-    chunkInput.min = '1';
-    chunkInput.max = '6';
-    chunkInput.value = state.chunk;
-    chunkLabel.appendChild(chunkInput);
-
-    const adaptiveLabel = document.createElement('label');
-    adaptiveLabel.textContent = 'Адаптивная длительность';
-    const adaptiveToggle = document.createElement('button');
-    adaptiveToggle.className = 'rsvp-btn';
-    adaptiveToggle.textContent = state.adaptive ? 'ON' : 'OFF';
-    adaptiveToggle.setAttribute('aria-pressed', state.adaptive);
-    adaptiveLabel.appendChild(adaptiveToggle);
-
-    const openOriginal = document.createElement('button');
-    openOriginal.className = 'rsvp-btn';
-    openOriginal.textContent = 'Открыть оригинал';
-
-    const progressWrap = document.createElement('div');
-    progressWrap.className = 'rsvp-progress';
-    const progressBar = document.createElement('div');
-    progressBar.className = 'rsvp-progress-bar';
-    progressWrap.appendChild(progressBar);
-
-    const row1 = document.createElement('div');
-    row1.className = 'rsvp-row';
-    row1.append(playBtn, stopBtn, prevBtn, nextBtn, openOriginal);
-
-    const row2 = document.createElement('div');
-    row2.className = 'rsvp-row';
-    row2.append(wpmLabel, chunkLabel, adaptiveLabel);
-
-    controls.append(row1, row2, progressWrap);
+    controls.append(progressWrap, controlRow);
 
     modal.append(srReturn, header, desc, warning, screen, controls);
     backdrop.appendChild(modal);
 
-    return {backdrop, modal, closeBtn, playBtn, stopBtn, prevBtn, nextBtn, wordBox, wpmInput, chunkInput, adaptiveToggle, progressBar, openOriginal, warning};
+    return {backdrop, modal, closeBtn, playBtn, wordBox, wpmInput, progressBar, warning};
   }
 
   // Runner that handles scheduling
@@ -571,13 +539,7 @@
       ui.closeBtn.addEventListener('click', closeModal);
       ui.backdrop.addEventListener('click', (e)=>{ if(e.target === ui.backdrop) closeModal(); });
       ui.playBtn.addEventListener('click', ()=>player.play());
-      ui.stopBtn.addEventListener('click', ()=>player.stop());
-      ui.nextBtn.addEventListener('click', ()=>player.next());
-      ui.prevBtn.addEventListener('click', ()=>player.prev());
       ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
-      ui.chunkInput.addEventListener('change', ()=>{ state.chunk = Math.max(1, parseInt(ui.chunkInput.value,10)||options.defaultChunk); });
-      ui.adaptiveToggle.addEventListener('click', ()=>{ state.adaptive = !state.adaptive; ui.adaptiveToggle.textContent = state.adaptive ? 'ON' : 'OFF'; ui.adaptiveToggle.setAttribute('aria-pressed', state.adaptive); });
-      ui.openOriginal.addEventListener('click', ()=>{ closeModal(); window.scrollTo({top:0, behavior:'smooth'}); });
 
       // Simple demo mode for localhost or data attribute
       if(location.hostname === 'localhost' || document.body.dataset.demo === 'rsvp'){
