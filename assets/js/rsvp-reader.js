@@ -136,7 +136,21 @@
           break;
         }
       }
-      if(!startNode || !endNode) return null;
+
+      // Fallback: if exact nodes were not resolved (for example when markup
+      // nesting splits the word), try to highlight the closest available text
+      // node so that inline selection still appears instead of silently
+      // failing.
+      if(!startNode || !endNode){
+        const first = textNodes[0];
+        if(first){
+          const fallback = document.createRange();
+          fallback.selectNodeContents(first.node);
+          return fallback;
+        }
+        return null;
+      }
+
       const range = document.createRange();
       range.setStart(startNode, startOffset);
       range.setEnd(endNode, endOffset);
@@ -407,7 +421,9 @@
     };
 
     const updateProgress = ()=>{
-      const ratio = Math.min(1, state.index / words.length);
+      const midpointOffset = Math.max(0, state.chunk - 1) / 2;
+      const progressIndex = Math.max(0, state.index - midpointOffset);
+      const ratio = words.length ? Math.min(1, progressIndex / words.length) : 0;
       const percent = ratio * 100;
       ui.progressBar.style.width = percent.toFixed(2) + '%';
       if(state.playing && article && isPanelOpen && isPanelOpen()){
