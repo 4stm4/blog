@@ -473,8 +473,12 @@
       let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
       const player = createPlayer(words, state, ui, article, ()=>isPanelOpen);
+      const siteHeader = document.querySelector('.site-header .container-xl') || document.querySelector('.site-header');
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
-      if(headerEl && headerEl.parentNode){
+
+      if(siteHeader){
+        siteHeader.appendChild(ui.container);
+      } else if(headerEl && headerEl.parentNode){
         headerEl.parentNode.insertBefore(ui.container, headerEl.nextSibling);
       } else {
         article.insertBefore(ui.container, article.firstChild);
