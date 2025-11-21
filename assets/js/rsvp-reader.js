@@ -68,17 +68,20 @@
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
       .rsvp-container{margin:1rem 0 1.5rem;}
       .rsvp-panel{background:#111a15;color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
-      .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
+      .rsvp-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;gap:0.75rem;flex-wrap:wrap;}
+      .rsvp-header-actions{display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;justify-content:flex-end;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
       .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
       .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
       .rsvp-controls{display:flex;flex-direction:column;gap:0.75rem;align-items:stretch;}
-      .rsvp-control-row{display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;}
-      .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
-      .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-btn{padding:0.45rem 0.65rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-bright, #3a4a41);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;}
-      .rsvp-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
+      .rsvp-header .rsvp-wpm{display:flex;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
+      .rsvp-controls input[type="number"],
+      .rsvp-header .rsvp-wpm input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
+      .rsvp-btn{padding:0.35rem 0.85rem;border-radius:var(--border-radius-sm, 10px);border:1px solid transparent;background:none;color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;gap:0.4rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+      .rsvp-play-wrap.nav-item-cta .rsvp-btn.nav-link{border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);box-shadow:var(--card-shadow, 0 10px 25px rgba(3, 8, 5, 0.4));}
+      .rsvp-btn.nav-link{color:inherit;text-decoration:none;}
+      .rsvp-btn:hover{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
       .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
@@ -247,7 +250,9 @@
     desc.className = 'sr-only';
     desc.textContent = 'Пробел — play/pause, стрелки — prev/next.';
     panel.setAttribute('aria-describedby', desc.id);
-    header.append(title);
+    const headerActions = document.createElement('div');
+    headerActions.className = 'rsvp-header-actions';
+    header.append(title, headerActions);
 
     const warning = document.createElement('div');
     warning.className = 'rsvp-warning';
@@ -270,15 +275,16 @@
     progressWrap.appendChild(progressBar);
 
     const playBtn = document.createElement('button');
-    playBtn.className = 'rsvp-btn';
+    playBtn.className = 'rsvp-btn nav-link';
     playBtn.textContent = 'Play / Pause';
     playBtn.title = 'Пробел — воспроизведение/пауза';
 
-    const controlRow = document.createElement('div');
-    controlRow.className = 'rsvp-control-row';
-    controlRow.appendChild(playBtn);
+    const playWrap = document.createElement('div');
+    playWrap.className = 'nav-item nav-item-cta rsvp-play-wrap';
+    playWrap.appendChild(playBtn);
 
     const wpmLabel = document.createElement('label');
+    wpmLabel.className = 'rsvp-wpm';
     wpmLabel.textContent = 'WPM';
     const wpmInput = document.createElement('input');
     wpmInput.type = 'number';
@@ -287,9 +293,10 @@
     wpmInput.step = '25';
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
-    controlRow.appendChild(wpmLabel);
 
-    controls.append(progressWrap, controlRow);
+    headerActions.append(playWrap, wpmLabel);
+
+    controls.append(progressWrap);
 
     panel.append(header, desc, warning, screen, controls);
     container.appendChild(panel);
