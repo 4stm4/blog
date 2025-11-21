@@ -165,8 +165,18 @@
     const rect = article.getBoundingClientRect();
     const start = scrollTop + rect.top;
     const travel = Math.max(0, article.scrollHeight - window.innerHeight + 80);
-    const target = start + travel * Math.min(1, ratio);
-    window.scrollTo({top: target, behavior: 'smooth'});
+
+    // Do not move the viewport backwards: clamp the effective ratio so that we
+    // never scroll above the current position even if the computed RSVP
+    // progress is behind the reader's manual scroll.
+    const targetRatio = Math.min(1, ratio);
+    const currentRatio = travel > 0 ? Math.min(1, Math.max(0, (scrollTop - start) / travel)) : 0;
+    const effectiveRatio = Math.max(targetRatio, currentRatio);
+
+    const target = start + travel * effectiveRatio;
+    if(Math.abs(target - scrollTop) > 1){
+      window.scrollTo({top: target, behavior: 'smooth'});
+    }
   }
 
   // Validate and normalize freqMap payloads to avoid heavy or malformed data
