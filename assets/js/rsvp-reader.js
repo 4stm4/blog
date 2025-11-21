@@ -14,9 +14,11 @@
       article: 'article, .post, main, #content',
       title: 'h1'
     },
-    defaultWpm: 350,
+    defaultWpm: 250,
+    maxWpm: 600,
     defaultChunk: 1,
     adaptive: true,
+    minDelayMs: 110,
     lenThreshold: 8,
     lenFactorPerChar: 0.05,
     longWordSplitAt: 16,
@@ -356,7 +358,7 @@
     const wpmInput = document.createElement('input');
     wpmInput.type = 'number';
     wpmInput.min = '100';
-    wpmInput.max = '1200';
+    wpmInput.max = String(state.maxWpm || 1200);
     wpmInput.step = '25';
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
@@ -401,7 +403,13 @@
         range.setEnd(anchor.endContainer, anchor.endOffset);
         const mark = document.createElement('mark');
         mark.className = 'rsvp-inline-highlight';
-        range.surroundContents(mark);
+
+        // `surroundContents` throws when the selection spans complex markup
+        // (e.g. nested links or inline code). Extracting the contents keeps
+        // highlights stable while preserving the original nodes for unwrapping.
+        const contents = range.extractContents();
+        mark.appendChild(contents);
+        range.insertNode(mark);
         return mark;
       } catch(e){
         return null;
@@ -487,7 +495,8 @@
         factor *= lexicalComplexity(clean, st, freqMap);
         return factor;
       });
-      return baseMs * Math.max(...multipliers);
+      const adaptiveMs = baseMs * Math.max(...multipliers);
+      return Math.max(st.minDelayMs || 0, adaptiveMs);
     };
 
     const play = ()=>{
@@ -592,6 +601,7 @@
         wpm: options.defaultWpm,
         chunk: options.defaultChunk,
         adaptive: options.adaptive,
+        maxWpm: options.maxWpm,
         index: 0,
         lenThreshold: options.lenThreshold,
         lenFactorPerChar: options.lenFactorPerChar,
@@ -600,6 +610,7 @@
         lexicalVowelWeight: options.lexicalVowelWeight,
         lexicalHyphenWeight: options.lexicalHyphenWeight,
         lexicalLengthWeight: options.lexicalLengthWeight,
+        minDelayMs: options.minDelayMs,
         freqMapUrl: options.freqMapUrl,
         enableFreqMap: options.enableFreqMap,
         freqMapTimeoutMs: options.freqMapTimeoutMs,
@@ -649,7 +660,12 @@
       // Wiring UI controls
       toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
       ui.playBtn.addEventListener('click', ()=>player.play());
-      ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
+      ui.wpmInput.addEventListener('change', ()=>{
+        const raw = parseInt(ui.wpmInput.value, 10);
+        const clamped = Math.min(state.maxWpm || options.maxWpm || 1200, Math.max(100, raw || options.defaultWpm));
+        state.wpm = clamped;
+        ui.wpmInput.value = String(clamped);
+      });
       ui.panel.addEventListener('keydown', keyHandler);
 
       // Simple demo mode for localhost or data attribute
@@ -677,7 +693,7 @@
   if(typeof window !== 'undefined'){
     window.addEventListener('DOMContentLoaded', ()=>{
       if(window.rsvpAutoInit !== false){
-        initRsvpReader({defaultWpm:350, adaptive:true});
+        initRsvpReader({defaultWpm:250, adaptive:true});
       }
     });
     // For SPA/router setups, call initRsvpReader() manually after route changes to reattach the toggle.
