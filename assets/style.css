@@ -74,6 +74,10 @@ a:focus {
   padding: 1rem 0;
 }
 
+.site-header .rsvp-container {
+  margin: 1rem 0 0;
+}
+
 .header-inner {
   display: grid;
   grid-template-columns: auto 1fr auto;
