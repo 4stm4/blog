@@ -752,3 +752,18 @@ code {
     gap: 0.5rem;
   }
 }
+
+/* RSVP inline highlights */
+.rsvp-word[data-rsvp-index] {
+  display: inline;
+  white-space: pre-wrap;
+  transition: none !important;
+}
+
+.rsvp-word[data-rsvp-index].rsvp-current {
+  background: rgba(203, 88, 0, 0.28);
+  border-radius: 6px;
+  color: inherit;
+  padding: 0 0.08em;
+  transition: none !important;
+}
