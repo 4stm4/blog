@@ -483,6 +483,7 @@
     };
 
     const showWord = ()=>{
+      console.debug('[RSVP] showWord index:', state.index, 'word:', words[state.index]);
       if(state.index >= words.length){
         state.playing = false;
         timer = null;
@@ -495,6 +496,15 @@
       highlighter.highlightRange(startIndex, state.chunk);
       lastStart = startIndex;
       renderSlice(displaySlice);
+      // quick debug highlight by exact text match (temporary)
+      try {
+        const centerText = (displaySlice[Math.floor(displaySlice.length/2)] || '').trim();
+        if(centerText){
+          document.querySelectorAll('.rsvp-inline.rsvp-current').forEach(e => e.classList.remove('rsvp-current'));
+          const match = Array.from(document.querySelectorAll('.rsvp-inline')).find(e => e.textContent.trim() === centerText);
+          if(match) match.classList.add('rsvp-current');
+        }
+      } catch(e){}
       state.index += state.chunk;
       updateProgress();
 
@@ -629,12 +639,23 @@
       let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
       const player = createPlayer(words, wordElements, state, ui, article, ()=>isPanelOpen);
+      // --- debug: expose runtime to window for interactive debugging ----
+      if (typeof window !== 'undefined') {
+        window.rsvp = {
+          words,           // массив слов (только в пределах proceed — корректно)
+          elements: wordElements,
+          state,
+          player,
+          ui,
+          root
+        };
+      }
+      // -----------------------------------------------------------------
       const diagRoot = root || article;
       const siteHeader = document.querySelector('.site-header .container-xl') || document.querySelector('.site-header');
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
 
       if(typeof window !== 'undefined'){
-        window.rsvp = {words, elements: wordElements, state, player};
         window._rsvp_diagnostics = ()=>{
           const domTokens = (diagRoot && diagRoot.innerText ? diagRoot.innerText : '').trim().split(/\s+/).filter(Boolean);
           return {
