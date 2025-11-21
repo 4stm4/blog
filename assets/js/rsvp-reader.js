@@ -11,14 +11,12 @@
   // Default configuration values tuned for Russian text and blog layout
   const DEFAULT_OPTIONS = {
     selectorOverrides: {
-      article: 'article, .post-content, .post, main, #content',
+      article: 'article, .post, main, #content',
       title: 'h1'
     },
-    defaultWpm: 250,
-    maxWpm: 600,
+    defaultWpm: 350,
     defaultChunk: 1,
     adaptive: true,
-    minDelayMs: 110,
     lenThreshold: 8,
     lenFactorPerChar: 0.05,
     longWordSplitAt: 16,
@@ -36,7 +34,7 @@
     freqMapTimeoutMs: 4000,
     freqMapMaxBytes: 2000000,
     freqMapMaxEntries: 120000,
-    minWords: 30,
+    minWords: 120,
     commandRatioWarn: 0.3,
     idleChunkWords: 20000
   };
@@ -70,132 +68,61 @@
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
       .rsvp-container{margin:1rem 0 1.5rem;}
       .rsvp-panel{background:#111a15;color:var(--text-color, #d1d0c5);border-radius:18px;padding:1.2rem 1.4rem;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
-      .rsvp-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;gap:0.75rem;flex-wrap:wrap;}
-      .rsvp-header-actions{display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;justify-content:flex-end;}
+      .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
       .rsvp-header h2{margin:0;font-size:1rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));letter-spacing:0.04em;text-transform:uppercase;}
-      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}    
-      .rsvp-screen .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}    
-      /* inline words inside article must not inherit the panel style */
-      .rsvp-inline{ display:inline; font:inherit; color:inherit; font-weight:inherit; text-shadow:none; }
+      .rsvp-screen{background:var(--sub-color, #1b2620);border:1px solid var(--border-color, #2a2f33);border-radius:16px;min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:0.35rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
+      .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
       .rsvp-controls{display:flex;flex-direction:column;gap:0.75rem;align-items:stretch;}
-      .rsvp-header .rsvp-wpm{display:flex;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
-      .rsvp-controls input[type="number"],
-      .rsvp-header .rsvp-wpm input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-btn{padding:0.35rem 0.85rem;border-radius:var(--border-radius-sm, 10px);border:1px solid transparent;background:none;color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;gap:0.4rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
-      .rsvp-play-wrap.nav-item-cta .rsvp-btn.nav-link{border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);box-shadow:var(--card-shadow, 0 10px 25px rgba(3, 8, 5, 0.4));}
-      .rsvp-btn.nav-link{color:inherit;text-decoration:none;}
-      .rsvp-btn:hover{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
+      .rsvp-control-row{display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;}
+      .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;}
+      .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
+      .rsvp-btn{padding:0.45rem 0.65rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-bright, #3a4a41);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;}
+      .rsvp-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
       .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
       .rsvp-screen + .rsvp-controls .rsvp-progress{width:100%;}
       .rsvp-screen + .rsvp-controls{margin-top:0.25rem;}
-      .rsvp-inline-highlight{background:rgba(203, 88, 0, 0.28);color:inherit;border-radius:8px;padding:0 0.12em;}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-      .rsvp-inline[data-rsvp-index]{display:inline;white-space:pre-wrap;transition:none !important;}
-      .rsvp-inline[data-rsvp-index].rsvp-current{background:rgba(203, 88, 0, 0.28);border-radius:6px;padding:0 0.08em;transition:none !important;}
     `;
     document.head.appendChild(style);
   }
-  // Annotate readable text with indexed spans (single source of truth for RSVP)
-  function annotateArticleForRsvp(rootSelector = 'article, .post-content, .post, #content, main'){
-    const root = typeof rootSelector === 'string' ? document.querySelector(rootSelector) : rootSelector;
-    if(!root) return {words: [], elements: [], root: null, ready: Promise.resolve({words: [], elements: [], root: null})};
-    if(root.querySelector('.rsvp-word')){
-      const existing = Array.from(root.querySelectorAll('.rsvp-word'));
-      const payload = {words: existing.map(el=>el.textContent), elements: existing, root};
-      payload.ready = Promise.resolve(payload);
-      return payload;
-    }
+  // Utility: find closest ancestor matching any selector
+  function isInside(element, selectors){
+    if (!element) return false;
+    return element.closest(selectors);
+  }
 
-  const WORD_RE = supportsUnicodeProps
-      ? /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu
-      : new RegExp(`[${FALLBACK_CLASS}]+(?:['’\\-][${FALLBACK_CLASS}]+)*`, 'g');
-    const ignoredTags = /^(SCRIPT|STYLE|CODE|PRE|A|BUTTON|INPUT|TEXTAREA)$/i;
-    const wordElements = [];
-
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode(node){
-        if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-        const p = node.parentElement;
-        if(!p || ignoredTags.test(p.tagName)) return NodeFilter.FILTER_REJECT;
-        if(p.closest('[data-no-rsvp="true"], table, .commands, .cli')) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    });
-
-    const textNodes = [];
-    while(walker.nextNode()){
-      textNodes.push(walker.currentNode);
-    }
-
-    const processTextNodesInChunks = (nodes, onDone)=>{
-      let i = 0;
-      const chunk = ()=>{
-        const end = Math.min(nodes.length, i + 50);
-        for(; i < end; i++){
-          const tn = nodes[i];
-          const text = tn.nodeValue;
-          const parent = tn.parentNode;
-          const frag = document.createDocumentFragment();
-          let lastIndex = 0;
-          let match;
-
-          while((match = WORD_RE.exec(text)) !== null){
-            const pre = text.slice(lastIndex, match.index);
-            if(pre) frag.appendChild(document.createTextNode(pre));
-
-            const token = match[0];
-            const span = document.createElement('span');
-            span.className = 'rsvp-word rsvp-inline';
-            span.setAttribute('data-rsvp-index', wordElements.length);
-            span.setAttribute('aria-hidden', 'true');
-            span.textContent = token;
-            frag.appendChild(span);
-            wordElements.push(span);
-            lastIndex = WORD_RE.lastIndex;
-          }
-
-          const tail = text.slice(lastIndex);
-          if(tail) frag.appendChild(document.createTextNode(tail));
-          if(parent) parent.replaceChild(frag, tn);
-        }
-        if(i < nodes.length){
-          if(typeof global.requestIdleCallback === 'function'){
-            global.requestIdleCallback(chunk, {timeout:200});
-          } else {
-            setTimeout(chunk, 16);
-          }
-        } else {
-          onDone();
-        }
-      };
-      chunk();
+  // Extract readable text nodes respecting exclusions
+  function extractWords(container, options, done){
+    const allowed = Array.from(container.querySelectorAll('p, h2, h3, h4, li, blockquote'));
+    const words = [];
+    const skipSelectors = 'pre, code, table, .commands, .cli, [data-no-rsvp="true"]';
+    const pushClean = (text)=>{
+      const cleaned = text.replace(/\s+/g,' ').trim();
+      if(!cleaned) return;
+      // drop footer-like phrases
+      if(/понравилась статья|поделиться|рассылка/i.test(cleaned)) return;
+      cleaned.split(/\s+/).forEach(w=>words.push(w));
     };
 
-    const payload = {words: [], elements: wordElements, root, ready: null};
-    payload.ready = new Promise(resolve=>{
-      if(!textNodes.length){
-        const domTokens = (root.innerText || '').trim().split(/\s+/).filter(Boolean).length;
-        console.info('rsvp: annotated words count =', 0);
-        console.info('rsvp: dom tokens =', domTokens);
-        payload.words = [];
-        resolve(payload);
-        return;
+    // Process in idle chunks for huge posts
+    let index = 0;
+    const processChunk = ()=>{
+      const end = Math.min(allowed.length, index + 50);
+      for(; index < end; index++){
+        const el = allowed[index];
+        if(isInside(el, skipSelectors)) continue;
+        pushClean(el.textContent || '');
       }
-
-      processTextNodesInChunks(textNodes, ()=>{
-        // ensure words array exactly matches annotated spans (1:1)
-        payload.words = wordElements.map(el => el.textContent);
-        const domTokens = (root.innerText || '').trim().split(/\s+/).filter(Boolean).length;
-        console.info('rsvp: annotated words count =', payload.words.length);
-        console.info('rsvp: dom tokens =', domTokens);
-        resolve(payload);
-      });
-    });
-
-    return payload;
+      if(index < allowed.length){
+        ric(processChunk);
+      } else {
+        done(words);
+      }
+    };
+    processChunk();
   }
 
   // Heuristic for command heavy content
@@ -228,74 +155,6 @@
       multiplier *= Math.max(0.6, 1 - Math.min(freq/10000, 0.35));
     }
     return multiplier;
-  }
-
-  // Highlight RSVP tokens by index without costly DOM rewrites
-  function scrollHighlightedIntoView(el){
-    if(!el) return;
-    const rect = el.getBoundingClientRect();
-    const vh = window.innerHeight || document.documentElement.clientHeight;
-    if(rect.top < 80 || rect.bottom > vh - 80){
-      const offset = rect.top + window.pageYOffset - (vh / 2) + (rect.height / 2);
-      window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
-    }
-  }
-
-  function makeRsvpHighlighter(elements){
-    let prev = [];
-    return {
-      highlightRange(start, count){
-        prev.forEach(idx => {
-          const el = elements[idx];
-          if(el) el.classList.remove('rsvp-current');
-        });
-        const next = [];
-        if(start >= 0 && count > 0){
-          const end = Math.min(elements.length, start + count);
-          for(let i = Math.max(0, start); i < end; i++){
-            const el = elements[i];
-            if(!el) continue;
-            el.classList.add('rsvp-current');
-            next.push(i);
-          }
-          if(next.length){
-            const centerIdx = next[Math.floor(next.length/2)];
-            const el = elements[centerIdx];
-            scrollHighlightedIntoView(el);
-          }
-        }
-        prev = next;
-      },
-      clear(){
-        prev.forEach(idx => {
-          const el = elements[idx];
-          if(el) el.classList.remove('rsvp-current');
-        });
-        prev = [];
-      }
-    };
-  }
-
-  // Smoothly sync the scroll position of the article with RSVP progress
-  function syncArticleScroll(article, ratio){
-    if(typeof window === 'undefined' || !article || ratio < 0) return;
-    const doc = article.ownerDocument && article.ownerDocument.documentElement;
-    const scrollTop = (window.pageYOffset || (doc && doc.scrollTop) || 0) - ((doc && doc.clientTop) || 0);
-    const rect = article.getBoundingClientRect();
-    const start = scrollTop + rect.top;
-    const travel = Math.max(0, article.scrollHeight - window.innerHeight + 80);
-
-    // Do not move the viewport backwards: clamp the effective ratio so that we
-    // never scroll above the current position even if the computed RSVP
-    // progress is behind the reader's manual scroll.
-    const targetRatio = Math.min(1, ratio);
-    const currentRatio = travel > 0 ? Math.min(1, Math.max(0, (scrollTop - start) / travel)) : 0;
-    const effectiveRatio = Math.max(targetRatio, currentRatio);
-
-    const target = start + travel * effectiveRatio;
-    if(Math.abs(target - scrollTop) > 1){
-      window.scrollTo({top: target, behavior: 'smooth'});
-    }
   }
 
   // Validate and normalize freqMap payloads to avoid heavy or malformed data
@@ -366,9 +225,7 @@
     desc.className = 'sr-only';
     desc.textContent = 'Пробел — play/pause, стрелки — prev/next.';
     panel.setAttribute('aria-describedby', desc.id);
-    const headerActions = document.createElement('div');
-    headerActions.className = 'rsvp-header-actions';
-    header.append(title, headerActions);
+    header.append(title);
 
     const warning = document.createElement('div');
     warning.className = 'rsvp-warning';
@@ -377,12 +234,9 @@
 
     const screen = document.createElement('div');
     screen.className = 'rsvp-screen';
-    let wordBox = screen.querySelector('.rsvp-word');
-    if(!wordBox){
-      wordBox = document.createElement('div');
-      wordBox.className = 'rsvp-word';
-      screen.appendChild(wordBox);
-    }
+    const wordBox = document.createElement('div');
+    wordBox.className = 'rsvp-word';
+    screen.appendChild(wordBox);
 
     const controls = document.createElement('div');
     controls.className = 'rsvp-controls';
@@ -394,146 +248,97 @@
     progressWrap.appendChild(progressBar);
 
     const playBtn = document.createElement('button');
-    playBtn.className = 'rsvp-btn nav-link';
+    playBtn.className = 'rsvp-btn';
     playBtn.textContent = 'Play / Pause';
     playBtn.title = 'Пробел — воспроизведение/пауза';
 
-    const playWrap = document.createElement('div');
-    playWrap.className = 'nav-item nav-item-cta rsvp-play-wrap';
-    playWrap.appendChild(playBtn);
+    const controlRow = document.createElement('div');
+    controlRow.className = 'rsvp-control-row';
+    controlRow.appendChild(playBtn);
 
     const wpmLabel = document.createElement('label');
-    wpmLabel.className = 'rsvp-wpm';
     wpmLabel.textContent = 'WPM';
     const wpmInput = document.createElement('input');
     wpmInput.type = 'number';
     wpmInput.min = '100';
-    wpmInput.max = String(state.maxWpm || 1200);
+    wpmInput.max = '1200';
     wpmInput.step = '25';
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
+    controlRow.appendChild(wpmLabel);
 
-    headerActions.append(playWrap, wpmLabel);
-
-    controls.append(progressWrap);
+    controls.append(progressWrap, controlRow);
 
     panel.append(header, desc, warning, screen, controls);
     container.appendChild(panel);
-
-    // ensure UI wordBox is real element inside .rsvp-screen
-    const screenEl = panel.querySelector('.rsvp-screen') || panel;
-    let ensuredWordBox = screenEl.querySelector('.rsvp-word');
-    if(!ensuredWordBox){
-      ensuredWordBox = document.createElement('div');
-      ensuredWordBox.className = 'rsvp-word';
-      screenEl.appendChild(ensuredWordBox);
-    }
-    wordBox = ensuredWordBox;
 
     return {container, panel, playBtn, wordBox, wpmInput, progressBar, warning};
   }
 
   // Runner that handles scheduling
-  function createPlayer(words, wordElements, state, ui, article, isPanelOpen){
+  function createPlayer(words, state, ui){
     let timer = null;
     const freqMapHolder = {data:null, loaded:false};
-    let plannedElapsed = 0;
-    let startTs = 0;
-    let lastStart = 0;
-
-    const highlighter = makeRsvpHighlighter(wordElements);
-
-    const clearHighlights = ()=>highlighter && highlighter.clear();
 
     const updateProgress = ()=>{
-      const midpointOffset = Math.max(0, state.chunk - 1) / 2;
-      const progressIndex = Math.max(0, state.index - midpointOffset);
-      const ratio = words.length ? Math.min(1, progressIndex / words.length) : 0;
-      const percent = ratio * 100;
+      const percent = Math.min(100, (state.index / words.length) * 100);
       ui.progressBar.style.width = percent.toFixed(2) + '%';
-      if(state.playing && article && isPanelOpen && isPanelOpen()){
-        syncArticleScroll(article, ratio);
-      }
     };
 
     const renderSlice = (slice)=>{
-      const box = ui.wordBox;
-      if(!box) return;
+      ui.wordBox.textContent = '';
       const target = slice[Math.floor(slice.length/2)] || slice[0] || '';
       const {prefix, pivot, suffix} = formatWord(target);
-      box.innerHTML = '';
-      box.appendChild(document.createTextNode(prefix));
+      const prefixNode = document.createTextNode(prefix);
       const pivotNode = document.createElement('span');
       pivotNode.className = 'orp';
       pivotNode.textContent = pivot;
-      box.appendChild(pivotNode);
-      box.appendChild(document.createTextNode(suffix));
-      if(state.chunk > 1){
+      const suffixNode = document.createTextNode(suffix);
+      ui.wordBox.append(prefixNode, pivotNode, suffixNode);
+      if(state.chunk>1){
         const countSpan = document.createElement('span');
         countSpan.className = 'orp';
         countSpan.style.opacity = '.6';
         countSpan.style.fontSize = '.75em';
         countSpan.style.marginLeft = '.4em';
         countSpan.textContent = `(${slice.length})`;
-        box.appendChild(document.createTextNode(' '));
-        box.appendChild(countSpan);
+        ui.wordBox.append(' ', countSpan);
       }
-    };
-
-    const computeWordDuration = (word, wordIndex)=>{
-      if(typeof state.wordDuration === 'function'){
-        const custom = state.wordDuration(word, wordIndex, state);
-        return Math.max(state.minDelayMs || 0, Number.isFinite(custom) ? custom : 0);
-      }
-      const baseMs = 60000 / state.wpm;
-      if(!state.adaptive) return Math.max(state.minDelayMs || 0, baseMs);
-      let factor = 1;
-      const clean = cleanForTiming(word);
-      if(clean.length > state.lenThreshold){
-        factor += (clean.length - state.lenThreshold) * state.lenFactorPerChar;
-      }
-      if(/[.?!…]$/.test(clean)) factor *= state.punctuationFactors.strong;
-      else if(/[,:;]$/.test(clean)) factor *= state.punctuationFactors.medium;
-      const punctuationBonus = /[.?!…]$/.test(clean) ? 180 : /[,:;]$/.test(clean) ? 110 : 0;
-      factor *= lexicalComplexity(clean, state, freqMapHolder.data);
-      const duration = Math.max(state.minDelayMs || 0, baseMs * factor + punctuationBonus);
-      return duration;
-    };
-
-    const chunkDuration = (startIndex)=>{
-      let total = 0;
-      const end = Math.min(words.length, startIndex + state.chunk);
-      for(let i = startIndex; i < end; i++){
-        total += computeWordDuration(words[i], i);
-      }
-      return total;
     };
 
     const showWord = ()=>{
-      if(global && global.rsvpDebug){
-        console.debug('[RSVP] showWord index:', state.index, 'word:', words[state.index]);
-      }
       if(state.index >= words.length){
         state.playing = false;
         timer = null;
-        clearHighlights();
         return;
       }
-      const startIndex = state.index;
-      const slice = words.slice(startIndex, startIndex + state.chunk);
-      const displaySlice = state.splitLongWords ? slice.flatMap(w=>splitLongWord(w, state)) : slice;
-      highlighter.highlightRange(startIndex, state.chunk);
-      lastStart = startIndex;
-      renderSlice(displaySlice);
+      const slice = words.slice(state.index, state.index + state.chunk);
+      renderSlice(slice);
       state.index += state.chunk;
       updateProgress();
 
       if(state.playing){
-        plannedElapsed += chunkDuration(startIndex);
-        const target = startTs + plannedElapsed;
-        const delay = Math.max(0, target - performance.now());
+        const delay = computeDelay(slice, state, freqMapHolder.data);
         timer = setTimeout(showWord, delay);
       }
+    };
+
+    const computeDelay = (chunkWords, st, freqMap)=>{
+      const baseMs = (60000 / st.wpm) * Math.max(1, chunkWords.length);
+      if(!st.adaptive) return baseMs;
+      // use max multiplier in chunk to stay safe
+      const multipliers = chunkWords.map(w=>{
+        let factor = 1;
+        const clean = cleanForTiming(w);
+        if(clean.length > st.lenThreshold){
+          factor += (clean.length - st.lenThreshold) * st.lenFactorPerChar;
+        }
+        if(/[.?!]$/.test(clean)) factor *= st.punctuationFactors.strong;
+        else if(/[,:;]$/.test(clean)) factor *= st.punctuationFactors.medium;
+        factor *= lexicalComplexity(clean, st, freqMap);
+        return factor;
+      });
+      return baseMs * Math.max(...multipliers);
     };
 
     const play = ()=>{
@@ -545,8 +350,6 @@
         return;
       }
       state.playing = true;
-      plannedElapsed = 0;
-      startTs = performance.now();
       if(!freqMapHolder.loaded && state.enableFreqMap){
         freqMapHolder.loaded = true;
         const controller = new AbortController();
@@ -578,7 +381,6 @@
       state.index = 0;
       updateProgress();
       ui.wordBox.textContent = '';
-      clearHighlights();
     };
 
     const next = ()=>{
@@ -593,30 +395,20 @@
       showWord();
     };
 
-    const refreshHighlight = ()=>highlighter.highlightRange(lastStart, state.chunk);
-
-    return {play, pause, stop, next, prev, updateProgress, clearHighlights, refreshHighlight};
+    return {play, pause, stop, next, prev, updateProgress};
   }
 
   // Main initializer
   function initRsvpReader(userOptions={}){
-    if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', ()=>initRsvpReader(userOptions), {once:true});
-      return;
-    }
-
     const options = {...DEFAULT_OPTIONS, ...userOptions, selectorOverrides: {...DEFAULT_OPTIONS.selectorOverrides, ...(userOptions.selectorOverrides||{})}};
     injectStyles();
 
-    const article = document.querySelector(options.selectorOverrides.article || 'article, .post-content, .post, main, #content');
-    if(!article){
-      console.error('RSVP: контейнер статьи не найден');
-      return;
-    }
-    if(article.dataset.rsvpBound === 'true') return;
+    const article = document.querySelector(options.selectorOverrides.article || 'article, .post, main, #content');
+    if(!article || article.dataset.rsvpBound === 'true') return;
 
-    const annotation = annotateArticleForRsvp(article);
-    const proceed = ({words = [], elements: wordElements = [], root})=>{
+    extractWords(article, options, (rawWords)=>{
+      // Expand long words
+      let words = rawWords.flatMap(w=>splitLongWord(w, options));
       if(words.length < options.minWords) return;
 
       const commandRatio = computeCommandRatio(article.innerText || '');
@@ -638,7 +430,6 @@
         wpm: options.defaultWpm,
         chunk: options.defaultChunk,
         adaptive: options.adaptive,
-        maxWpm: options.maxWpm,
         index: 0,
         lenThreshold: options.lenThreshold,
         lenFactorPerChar: options.lenFactorPerChar,
@@ -647,54 +438,21 @@
         lexicalVowelWeight: options.lexicalVowelWeight,
         lexicalHyphenWeight: options.lexicalHyphenWeight,
         lexicalLengthWeight: options.lexicalLengthWeight,
-        minDelayMs: options.minDelayMs,
-        splitLongWords: options.splitLongWords,
-        wordDuration: options.wordDuration,
         freqMapUrl: options.freqMapUrl,
         enableFreqMap: options.enableFreqMap,
         freqMapTimeoutMs: options.freqMapTimeoutMs,
         freqMapMaxBytes: options.freqMapMaxBytes,
         freqMapMaxEntries: options.freqMapMaxEntries
       };
-      let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
-      const player = createPlayer(words, wordElements, state, ui, article, ()=>isPanelOpen);
-      // --- debug: expose runtime to window for interactive debugging ----
-      if (typeof window !== 'undefined') {
-        window.rsvp = {
-          words,           // массив слов (только в пределах proceed — корректно)
-          elements: wordElements,
-          state,
-          player,
-          ui,
-          root
-        };
-      }
-      // -----------------------------------------------------------------
-      const diagRoot = root || article;
-      const siteHeader = document.querySelector('.site-header .container-xl') || document.querySelector('.site-header');
+      const player = createPlayer(words, state, ui);
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
-
-      if(typeof window !== 'undefined'){
-        window._rsvp_diagnostics = ()=>{
-          const domTokens = (diagRoot && diagRoot.innerText ? diagRoot.innerText : '').trim().split(/\s+/).filter(Boolean);
-          return {
-            spanCount: wordElements.length,
-            wordsCount: words.length,
-            domTokens: domTokens.length,
-            firstWords: words.slice(0, 20),
-            firstElems: Array.from(wordElements).slice(0, 20).map(e=>e.textContent)
-          };
-        };
-      }
-
-      if(siteHeader){
-        siteHeader.appendChild(ui.container);
-      } else if(headerEl && headerEl.parentNode){
+      if(headerEl && headerEl.parentNode){
         headerEl.parentNode.insertBefore(ui.container, headerEl.nextSibling);
       } else {
         article.insertBefore(ui.container, article.firstChild);
       }
+      let isPanelOpen = false;
 
       const setPanelVisibility = (open)=>{
         isPanelOpen = open;
@@ -706,11 +464,9 @@
             ui.warning.style.display = 'block';
           }
           player.updateProgress();
-          player.refreshHighlight();
           (ui.playBtn || ui.panel).focus();
         } else {
           player.pause();
-          player.clearHighlights();
         }
       };
 
@@ -725,12 +481,7 @@
       // Wiring UI controls
       toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
       ui.playBtn.addEventListener('click', ()=>player.play());
-      ui.wpmInput.addEventListener('change', ()=>{
-        const raw = parseInt(ui.wpmInput.value, 10);
-        const clamped = Math.min(state.maxWpm || options.maxWpm || 1200, Math.max(100, raw || options.defaultWpm));
-        state.wpm = clamped;
-        ui.wpmInput.value = String(clamped);
-      });
+      ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
       ui.panel.addEventListener('keydown', keyHandler);
 
       // Simple demo mode for localhost or data attribute
@@ -739,15 +490,7 @@
         setPanelVisibility(true);
         player.play();
       }
-    };
-
-    if(annotation && annotation.ready && typeof annotation.ready.then === 'function'){
-      annotation.ready.then(proceed).catch(err=>{
-        console.error('RSVP: annotateArticleForRsvp failed', err);
-      });
-    } else {
-      proceed(annotation || {});
-    }
+    });
   }
 
   // Export for ESM and global usage
@@ -766,7 +509,7 @@
   if(typeof window !== 'undefined'){
     window.addEventListener('DOMContentLoaded', ()=>{
       if(window.rsvpAutoInit !== false){
-        initRsvpReader({defaultWpm:250, adaptive:true});
+        initRsvpReader({defaultWpm:350, adaptive:true});
       }
     });
     // For SPA/router setups, call initRsvpReader() manually after route changes to reattach the toggle.
@@ -776,12 +519,8 @@
   // 1) Подключите: <script src="/assets/js/rsvp-reader.js" defer></script>
   // 2) Вызовите: initRsvpReader({ selectorOverrides: { article: 'article', title: 'h1' }, defaultWpm: 350, adaptive: true });
   // 3) Кнопка появится возле заголовка статьи, панель раскрывается по клику.
-  
-  // Список селекторов 4stm4.ru: article, .post-content, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
-  // Консольные проверки в DevTools:
-  // console.log('rsvp words:', window.rsvp?.words?.length ?? 'no rsvp object');
-  // console.log('dom word count:', document.querySelector('article, .post-content, .post, #content, main').innerText.trim().split(/\s+/).length);
-  // window._rsvp_diagnostics();
+
+  // Список селекторов 4stm4.ru: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
 
 })(typeof window !== 'undefined' ? window : globalThis);
 
