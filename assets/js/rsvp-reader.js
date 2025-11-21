@@ -157,6 +157,18 @@
     return multiplier;
   }
 
+  // Smoothly sync the scroll position of the article with RSVP progress
+  function syncArticleScroll(article, ratio){
+    if(typeof window === 'undefined' || !article || ratio < 0) return;
+    const doc = article.ownerDocument && article.ownerDocument.documentElement;
+    const scrollTop = (window.pageYOffset || (doc && doc.scrollTop) || 0) - ((doc && doc.clientTop) || 0);
+    const rect = article.getBoundingClientRect();
+    const start = scrollTop + rect.top;
+    const travel = Math.max(0, article.scrollHeight - window.innerHeight + 80);
+    const target = start + travel * Math.min(1, ratio);
+    window.scrollTo({top: target, behavior: 'smooth'});
+  }
+
   // Validate and normalize freqMap payloads to avoid heavy or malformed data
   function validateFreqMap(data, options){
     if(!data || typeof data !== 'object' || Array.isArray(data)) return null;
@@ -276,13 +288,17 @@
   }
 
   // Runner that handles scheduling
-  function createPlayer(words, state, ui){
+  function createPlayer(words, state, ui, article, isPanelOpen){
     let timer = null;
     const freqMapHolder = {data:null, loaded:false};
 
     const updateProgress = ()=>{
-      const percent = Math.min(100, (state.index / words.length) * 100);
+      const ratio = Math.min(1, state.index / words.length);
+      const percent = ratio * 100;
       ui.progressBar.style.width = percent.toFixed(2) + '%';
+      if(state.playing && article && isPanelOpen && isPanelOpen()){
+        syncArticleScroll(article, ratio);
+      }
     };
 
     const renderSlice = (slice)=>{
@@ -444,15 +460,15 @@
         freqMapMaxBytes: options.freqMapMaxBytes,
         freqMapMaxEntries: options.freqMapMaxEntries
       };
+      let isPanelOpen = false;
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
-      const player = createPlayer(words, state, ui);
+      const player = createPlayer(words, state, ui, article, ()=>isPanelOpen);
       const headerEl = article.querySelector('.post-header') || titleEl.parentNode || article;
       if(headerEl && headerEl.parentNode){
         headerEl.parentNode.insertBefore(ui.container, headerEl.nextSibling);
       } else {
         article.insertBefore(ui.container, article.firstChild);
       }
-      let isPanelOpen = false;
 
       const setPanelVisibility = (open)=>{
         isPanelOpen = open;
