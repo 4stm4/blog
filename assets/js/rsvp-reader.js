@@ -66,7 +66,8 @@
     style.textContent = `
       .rsvp-toggle{margin-left:0.5rem;padding:0.35rem 0.65rem;border-radius:10px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-light, #242f29);color:var(--text-color, #d1d0c5);font-size:0.9rem;cursor:pointer;transition:all .2s ease;box-shadow:0 6px 18px rgba(4, 17, 12, 0.24);}
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
-      .rsvp-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2147483000;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+      .rsvp-layer-host{position:relative;isolation:isolate;}
+      .rsvp-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2147483000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:1.5rem 0;}
       .rsvp-backdrop.active{opacity:1;pointer-events:all;}
       .rsvp-modal{background:linear-gradient(160deg, var(--bg-color-light, #111a15), var(--bg-color, #060c09));color:var(--text-color, #d1d0c5);min-width: min(90vw,720px);max-width: min(95vw,900px);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--card-shadow, 0 20px 45px rgba(3, 8, 5, 0.55));border:1px solid rgba(122, 191, 157, 0.12);position:relative;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
       .rsvp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;}
@@ -461,6 +462,10 @@
       const player = createPlayer(words, state, ui);
       let lastFocused = null;
       const backgroundContainer = article.closest('main, #content') || article.closest('body') || article;
+      const layerHost = article.closest('.container-xl') || backgroundContainer || document.body;
+      if(layerHost && !layerHost.classList.contains('rsvp-layer-host')){
+        layerHost.classList.add('rsvp-layer-host');
+      }
       let isModalOpen = false;
       let inertApplied = false;
       let prevPointer = '';
@@ -469,7 +474,7 @@
       const openModal = ()=>{
         if(isModalOpen) return;
         lastFocused = document.activeElement;
-        document.body.appendChild(ui.backdrop);
+        (layerHost || document.body).appendChild(ui.backdrop);
         setTimeout(()=>ui.backdrop.classList.add('active'), 10);
         ui.backdrop.setAttribute('aria-hidden','false');
         isModalOpen = true;
