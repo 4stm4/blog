@@ -79,8 +79,8 @@
       .rsvp-controls{display:flex;flex-direction:column;gap:0.65rem;align-items:stretch;padding:0.25rem 0.75rem 0.75rem;}
       .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;justify-content:space-between;}
       .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-btn{padding:0.45rem 0.65rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--sub-color-bright, #3a4a41);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;}
-      .rsvp-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
+      .rsvp-control-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.55rem 0.75rem;border-radius:12px;border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;}
+      .rsvp-control-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
       .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
@@ -245,17 +245,17 @@
     progressWrap.appendChild(progressBar);
 
     const playBtn = document.createElement('button');
-    playBtn.className = 'rsvp-btn';
+    playBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
     playBtn.textContent = 'Play';
     playBtn.title = 'Пробел — воспроизведение';
 
     const pauseBtn = document.createElement('button');
-    pauseBtn.className = 'rsvp-btn';
+    pauseBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
     pauseBtn.textContent = 'Pause';
     pauseBtn.title = 'Пауза';
 
     const restartBtn = document.createElement('button');
-    restartBtn.className = 'rsvp-btn';
+    restartBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
     restartBtn.textContent = 'Restart';
     restartBtn.title = 'Начать сначала';
 
