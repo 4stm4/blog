@@ -35,7 +35,6 @@
     freqMapMaxBytes: 2000000,
     freqMapMaxEntries: 120000,
     minWords: 120,
-    commandRatioWarn: 0.3,
     idleChunkWords: 20000
   };
 
@@ -79,11 +78,10 @@
       .rsvp-controls{display:flex;flex-direction:column;gap:0.65rem;align-items:stretch;padding:0.25rem 0.25rem 0.25rem;max-width:110px;width:100%;}
       .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;justify-content:space-between;}
       .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-control-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.3rem 0.65rem;border-radius:12px;border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;font-size:0.85rem;}
+      .rsvp-control-btn{display:flex;align-items:center;justify-content:center;gap:0.1rem;padding:0.3rem 0.3rem;border-radius:12px;border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:600;letter-spacing:0.05em;font-size:0.75rem;}
       .rsvp-control-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
-      .rsvp-warning{background:rgba(122, 191, 157, 0.12);color:var(--active-color, #7abf9d);padding:0.5rem 0.75rem;border-radius:12px;margin-bottom:0.5rem;font-size:0.85rem;border:1px solid rgba(122, 191, 157, 0.35);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
     `;
     document.head.appendChild(style);
@@ -123,14 +121,6 @@
       }
     };
     processChunk();
-  }
-
-  // Heuristic for command heavy content
-  function computeCommandRatio(text){
-    const lines = text.split(/\n+/).filter(Boolean);
-    if(!lines.length) return 0;
-    const commandLines = lines.filter(l=>/^\s{4}|^\$/.test(l)).length;
-    return commandLines / lines.length;
   }
 
   // Simple cleaner that respects Unicode fallback support (keeps punctuation for timing)
@@ -218,11 +208,6 @@
     desc.textContent = 'Пробел — play/pause, стрелки — prev/next.';
     panel.setAttribute('aria-describedby', desc.id);
 
-    const warning = document.createElement('div');
-    warning.className = 'rsvp-warning';
-    warning.style.display = 'none';
-    warning.textContent = 'Статья содержит много команд — рекомендуем читать обычным видом.';
-
     const screen = document.createElement('div');
     screen.className = 'rsvp-screen';
     const wordBox = document.createElement('div');
@@ -274,10 +259,10 @@
     screenWrap.append(screen, progressWrap);
     layout.append(controls, screenWrap);
 
-    panel.append(desc, warning, layout);
+    panel.append(desc, layout);
     container.appendChild(panel);
 
-    return {container, panel, playBtn, pauseBtn, restartBtn, wordBox, wpmInput, progressBar, warning};
+    return {container, panel, playBtn, pauseBtn, restartBtn, wordBox, wpmInput, progressBar};
   }
 
   // Runner that handles scheduling
@@ -416,8 +401,6 @@
       let words = rawWords.flatMap(w=>splitLongWord(w, options));
       if(words.length < options.minWords) return;
 
-      const commandRatio = computeCommandRatio(article.innerText || '');
-
       // create button near title (avoid duplicates)
       let titleEl = document.querySelector(options.selectorOverrides.title || 'h1');
       if(!titleEl) titleEl = article.querySelector('h1') || article.querySelector('h2') || article;
@@ -465,9 +448,6 @@
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         toggle.textContent = open ? 'Скрыть скорочтение' : 'Скорочтение';
         if(open){
-          if(commandRatio > options.commandRatioWarn){
-            ui.warning.style.display = 'block';
-          }
           player.updateProgress();
           (ui.playBtn || ui.panel).focus();
         } else {
