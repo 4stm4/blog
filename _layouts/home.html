@@ -2,24 +2,6 @@
 layout: default
 ---
 <div class="home">
-  {%- assign hero_title = page.hero_title | default: page.title | default: "Живой блог инженера" -%}
-  {%- assign hero_lead = page.intro_lead | default: "Решения, инструкции и заметки об инфраструктуре, программировании и железе на практике." -%}
-  <section class="hero">
-    <p class="hero-kicker">{{ page.hero_kicker | default: "Blog 4stm4" }}</p>
-    <h1 class="hero-title">{{ hero_title }}</h1>
-    <p class="hero-lead">{{ hero_lead }}</p>
-    <div class="hero-actions">
-      <a class="btn-primary" href="{{ '/categories/' | relative_url }}">Исследовать темы</a>
-      <a class="btn-secondary" href="mailto:{{ site.email }}">Обсудить задачу</a>
-    </div>
-  </section>
-
-  {%- if content -%}
-  <section class="intro-section">
-    {{ content }}
-  </section>
-  {%- endif -%}
-
   {%- if site.categories and site.categories.size > 0 -%}
   <section class="topic-section" aria-labelledby="topic-heading">
     <div class="section-heading">
