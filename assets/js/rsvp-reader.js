@@ -246,8 +246,18 @@
 
     const playBtn = document.createElement('button');
     playBtn.className = 'rsvp-btn';
-    playBtn.textContent = 'Play / Pause';
-    playBtn.title = 'Пробел — воспроизведение/пауза';
+    playBtn.textContent = 'Play';
+    playBtn.title = 'Пробел — воспроизведение';
+
+    const pauseBtn = document.createElement('button');
+    pauseBtn.className = 'rsvp-btn';
+    pauseBtn.textContent = 'Pause';
+    pauseBtn.title = 'Пауза';
+
+    const restartBtn = document.createElement('button');
+    restartBtn.className = 'rsvp-btn';
+    restartBtn.textContent = 'Restart';
+    restartBtn.title = 'Начать сначала';
 
     const wpmLabel = document.createElement('label');
     wpmLabel.textContent = 'WPM';
@@ -259,7 +269,7 @@
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
 
-    controls.append(wpmLabel, playBtn);
+    controls.append(wpmLabel, playBtn, pauseBtn, restartBtn);
 
     screenWrap.append(screen, progressWrap);
     layout.append(controls, screenWrap);
@@ -267,7 +277,7 @@
     panel.append(desc, warning, layout);
     container.appendChild(panel);
 
-    return {container, panel, playBtn, wordBox, wpmInput, progressBar, warning};
+    return {container, panel, playBtn, pauseBtn, restartBtn, wordBox, wpmInput, progressBar, warning};
   }
 
   // Runner that handles scheduling
@@ -338,12 +348,7 @@
 
     const play = ()=>{
       if(state.index >= words.length) state.index = 0;
-      if(state.playing){
-        state.playing = false;
-        if(timer) clearTimeout(timer);
-        timer = null;
-        return;
-      }
+      if(state.playing) return;
       state.playing = true;
       if(!freqMapHolder.loaded && state.enableFreqMap){
         freqMapHolder.loaded = true;
@@ -378,6 +383,11 @@
       ui.wordBox.textContent = '';
     };
 
+    const restart = ()=>{
+      stop();
+      play();
+    };
+
     const next = ()=>{
       pause();
       state.index = Math.min(words.length, state.index + state.chunk);
@@ -390,7 +400,7 @@
       showWord();
     };
 
-    return {play, pause, stop, next, prev, updateProgress};
+    return {play, pause, stop, restart, next, prev, updateProgress};
   }
 
   // Main initializer
@@ -468,7 +478,7 @@
       const keyHandler = (e)=>{
         if(!isPanelOpen) return;
         const focusInside = ui.panel.contains(document.activeElement);
-        if((e.code === 'Space' || e.key === ' ') && focusInside){ e.preventDefault(); player.play(); }
+        if((e.code === 'Space' || e.key === ' ') && focusInside){ e.preventDefault(); state.playing ? player.pause() : player.play(); }
         else if(e.key === 'ArrowRight' && focusInside){ e.preventDefault(); player.next(); }
         else if(e.key === 'ArrowLeft' && focusInside){ e.preventDefault(); player.prev(); }
       };
@@ -476,6 +486,8 @@
       // Wiring UI controls
       toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
       ui.playBtn.addEventListener('click', ()=>player.play());
+      ui.pauseBtn.addEventListener('click', ()=>player.pause());
+      ui.restartBtn.addEventListener('click', ()=>player.restart());
       ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
       ui.panel.addEventListener('keydown', keyHandler);
 
