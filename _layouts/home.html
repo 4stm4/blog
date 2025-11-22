@@ -3,9 +3,8 @@ layout: default
 ---
 <div class="home">
   {%- if site.categories and site.categories.size > 0 -%}
-  <section class="topic-section" aria-labelledby="topic-heading">
+  <section class="topic-section" aria-label="Категории блога">
     <div class="section-heading">
-      <h2 id="topic-heading">Популярные направления</h2>
       <a class="section-link" href="{{ '/categories/' | relative_url }}">Все категории</a>
     </div>
     <div class="topic-grid">
