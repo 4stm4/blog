@@ -68,7 +68,7 @@
       .rsvp-toggle:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.4);transform:translateY(-1px);}
       .rsvp-container{margin:0;}
       .rsvp-panel{background:#111a15;color:var(--text-color, #d1d0c5);border-radius:18px;padding:0;font-family:-apple-system, system-ui, 'Segoe UI', sans-serif;}
-      .rsvp-layout{display:grid;grid-template-columns:minmax(240px, 360px) 1fr;gap:1rem;align-items:flex-start;padding:0.75rem;}
+      .rsvp-layout{display:grid;grid-template-columns:minmax(120px, 60px) 1fr;gap:1rem;align-items:flex-start;padding:0.75rem;}
       @media (max-width:720px){
         .rsvp-layout{grid-template-columns:1fr;}
       }
@@ -76,10 +76,10 @@
       .rsvp-screen{background:#080c0a;border:1px solid #263d31;border-radius:16px;min-height:120px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(122, 191, 157, 0.06);}
       .rsvp-word{font-size:2.6rem;letter-spacing:0.03em;color:var(--text-color, #d1d0c5);font-weight:700;text-shadow:0 6px 25px rgba(0,0,0,0.35);}
       .rsvp-word .orp{color:var(--select-color, #cb5800);}
-      .rsvp-controls{display:flex;flex-direction:column;gap:0.65rem;align-items:stretch;padding:0.25rem 0.75rem 0.75rem;max-width:360px;width:100%;}
+      .rsvp-controls{display:flex;flex-direction:column;gap:0.65rem;align-items:stretch;padding:0.25rem 0.25rem 0.25rem;max-width:110px;width:100%;}
       .rsvp-controls label{display:flex;flex-direction:row;align-items:center;font-size:0.9rem;color:var(--muted-color, rgba(209, 208, 197, 0.7));gap:0.5rem;justify-content:space-between;}
       .rsvp-controls input[type="number"]{padding:0.35rem 0.5rem;border-radius:12px;border:1px solid var(--border-color, #2a2f33);background:var(--bg-color-light, #111a15);color:var(--text-color, #d1d0c5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
-      .rsvp-control-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.4rem 0.65rem;border-radius:12px;border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;font-size:0.85rem;}
+      .rsvp-control-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.3rem 0.65rem;border-radius:12px;border:1px solid rgba(122, 191, 157, 0.25);background:rgba(122, 191, 157, 0.1);color:var(--text-color, #d1d0c5);cursor:pointer;transition:all .2s ease;box-shadow:0 10px 25px rgba(3, 8, 5, 0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;font-size:0.85rem;}
       .rsvp-control-btn:hover{background:var(--active-color, #7abf9d);color:var(--bg-color, #060c09);border-color:rgba(122, 191, 157, 0.45);transform:translateY(-1px);}
       .rsvp-progress{width:100%;height:9px;border-radius:999px;background:var(--border-color, #2a2f33);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.35);}
       .rsvp-progress-bar{height:100%;background:linear-gradient(90deg,var(--active-color, #7abf9d),var(--select-color, #cb5800));width:0%;transition:width .15s ease;}
