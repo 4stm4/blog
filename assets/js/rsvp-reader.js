@@ -229,15 +229,10 @@
     progressBar.className = 'rsvp-progress-bar';
     progressWrap.appendChild(progressBar);
 
-    const playBtn = document.createElement('button');
-    playBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
-    playBtn.textContent = 'Play';
-    playBtn.title = 'Пробел — воспроизведение';
-
-    const pauseBtn = document.createElement('button');
-    pauseBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
-    pauseBtn.textContent = 'Pause';
-    pauseBtn.title = 'Пауза';
+    const playPauseBtn = document.createElement('button');
+    playPauseBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
+    playPauseBtn.textContent = 'Play';
+    playPauseBtn.title = 'Пробел — воспроизведение/пауза';
 
     const restartBtn = document.createElement('button');
     restartBtn.className = 'nav-link nav-item-cta rsvp-control-btn';
@@ -254,7 +249,7 @@
     wpmInput.value = state.wpm;
     wpmLabel.appendChild(wpmInput);
 
-    controls.append(wpmLabel, playBtn, pauseBtn, restartBtn);
+    controls.append(wpmLabel, playPauseBtn, restartBtn);
 
     screenWrap.append(screen, progressWrap);
     layout.append(controls, screenWrap);
@@ -262,7 +257,7 @@
     panel.append(desc, layout);
     container.appendChild(panel);
 
-    return {container, panel, playBtn, pauseBtn, restartBtn, wordBox, wpmInput, progressBar};
+    return {container, panel, playPauseBtn, restartBtn, wordBox, wpmInput, progressBar};
   }
 
   // Runner that handles scheduling
@@ -274,6 +269,15 @@
       const percent = Math.min(100, (state.index / words.length) * 100);
       ui.progressBar.style.width = percent.toFixed(2) + '%';
     };
+
+    const updatePlayPauseUi = ()=>{
+      const isPlaying = state.playing;
+      ui.playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      ui.playPauseBtn.title = isPlaying ? 'Пауза' : 'Пробел — воспроизведение/пауза';
+      ui.playPauseBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+    };
+
+    updatePlayPauseUi();
 
     const renderSlice = (slice)=>{
       ui.wordBox.textContent = '';
@@ -300,6 +304,7 @@
       if(state.index >= words.length){
         state.playing = false;
         timer = null;
+        updatePlayPauseUi();
         return;
       }
       const slice = words.slice(state.index, state.index + state.chunk);
@@ -335,6 +340,7 @@
       if(state.index >= words.length) state.index = 0;
       if(state.playing) return;
       state.playing = true;
+      updatePlayPauseUi();
       if(!freqMapHolder.loaded && state.enableFreqMap){
         freqMapHolder.loaded = true;
         const controller = new AbortController();
@@ -359,6 +365,7 @@
       state.playing = false;
       if(timer) clearTimeout(timer);
       timer = null;
+      updatePlayPauseUi();
     };
 
     const stop = ()=>{
@@ -449,7 +456,7 @@
         toggle.textContent = open ? 'Скрыть скорочтение' : 'Скорочтение';
         if(open){
           player.updateProgress();
-          (ui.playBtn || ui.panel).focus();
+          (ui.playPauseBtn || ui.panel).focus();
         } else {
           player.pause();
         }
@@ -465,8 +472,7 @@
 
       // Wiring UI controls
       toggle.addEventListener('click', ()=>setPanelVisibility(!isPanelOpen));
-      ui.playBtn.addEventListener('click', ()=>player.play());
-      ui.pauseBtn.addEventListener('click', ()=>player.pause());
+      ui.playPauseBtn.addEventListener('click', ()=>{ state.playing ? player.pause() : player.play(); });
       ui.restartBtn.addEventListener('click', ()=>player.restart());
       ui.wpmInput.addEventListener('change', ()=>{ state.wpm = Math.max(100, parseInt(ui.wpmInput.value,10)||options.defaultWpm); });
       ui.panel.addEventListener('keydown', keyHandler);
