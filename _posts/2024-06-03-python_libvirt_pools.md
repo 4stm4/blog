@@ -2,7 +2,7 @@
 layout: post
 title:  "Работа с виртуальными пулами через libvirt-python"
 date:   2024-06-03 21:21:21 +0500
-categories: programming
+categories: python
 ---
 
 ## Работа с виртуальными пулами через libvirt-python
