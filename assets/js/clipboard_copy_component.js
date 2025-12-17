@@ -35,6 +35,9 @@ document.addEventListener('clipboard-copy', function ({ target }) {
     }
     else {
         showCheck(button);
+        if (window.posthog && typeof window.posthog.capture === 'function') {
+            window.posthog.capture('copy_code');
+        }
     }
     clipboardCopyElementTimers.set(button, setTimeout(() => {
         showCopy(button);

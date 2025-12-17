@@ -340,6 +340,9 @@
       if(state.index >= words.length) state.index = 0;
       if(state.playing) return;
       state.playing = true;
+      if(window.posthog && typeof window.posthog.capture === 'function') {
+        window.posthog.capture('rsvp_play');
+      }
       updatePlayPauseUi();
       if(!freqMapHolder.loaded && state.enableFreqMap){
         freqMapHolder.loaded = true;
@@ -437,7 +440,8 @@
         enableFreqMap: options.enableFreqMap,
         freqMapTimeoutMs: options.freqMapTimeoutMs,
         freqMapMaxBytes: options.freqMapMaxBytes,
-        freqMapMaxEntries: options.freqMapMaxEntries
+        freqMapMaxEntries: options.freqMapMaxEntries,
+        _phOpened: false
       };
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
       const player = createPlayer(words, state, ui);
@@ -450,11 +454,16 @@
       let isPanelOpen = false;
 
       const setPanelVisibility = (open)=>{
+        const wasOpen = isPanelOpen;
         isPanelOpen = open;
         ui.container.hidden = !open;
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         toggle.textContent = open ? 'Скрыть скорочтение' : 'Скорочтение';
         if(open){
+          if(!state._phOpened && window.posthog && typeof window.posthog.capture === 'function') {
+            window.posthog.capture('rsvp_opened');
+            state._phOpened = true;
+          }
           player.updateProgress();
           (ui.playPauseBtn || ui.panel).focus();
         } else {
