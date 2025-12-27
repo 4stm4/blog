@@ -64,6 +64,77 @@
   <script src="{{ '/assets/js/clipboard.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/clipboard_copy_component.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/rsvp-reader.js' | relative_url }}" defer></script>
+  <script>
+    (function () {
+      var articleMeta = {
+        slug: {{ page.slug | jsonify }} || {{ page.url | jsonify }},
+        path: {{ page.url | relative_url | jsonify }},
+        categories: {{ page.categories | jsonify }} || [],
+        title: {{ page.title | jsonify }}
+      };
+      var sent = false;
+      var read75Sent = false;
+      var tryCapture = function () {
+        if (sent) return;
+        if (window.posthog && typeof window.posthog.capture === 'function') {
+          window.posthog.capture('article_view', articleMeta);
+          sent = true;
+        }
+      };
+      tryCapture();
+      if (!sent) {
+        var onLoad = function () {
+          tryCapture();
+          if (sent) {
+            window.removeEventListener('load', onLoad);
+            document.removeEventListener('DOMContentLoaded', onLoad);
+          }
+        };
+        window.addEventListener('load', onLoad);
+        document.addEventListener('DOMContentLoaded', onLoad);
+      }
+
+      var onScrollRead = function () {
+        if (read75Sent) return;
+        var body = document.body;
+        var html = document.documentElement;
+        var scrollTop = window.pageYOffset || html.scrollTop || body.scrollTop || 0;
+        var viewportHeight = window.innerHeight || html.clientHeight || 0;
+        var docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+        if (!docHeight) return;
+        var progress = (scrollTop + viewportHeight) / docHeight;
+        if (progress >= 0.75) {
+          if (window.posthog && typeof window.posthog.capture === 'function') {
+            window.posthog.capture('article_read_75', articleMeta);
+          }
+          read75Sent = true;
+          window.removeEventListener('scroll', onScrollRead);
+        }
+      };
+      window.addEventListener('scroll', onScrollRead, { passive: true });
+      onScrollRead();
+
+      var githubClickHandler = function (event) {
+        var anchor = event.target && event.target.closest ? event.target.closest('a[href*="github.com/"]') : null;
+        if (!anchor) return;
+        if (anchor.hostname && anchor.hostname.indexOf('github.com') === -1) return;
+        if (!(window.posthog && typeof window.posthog.capture === 'function')) return;
+        try {
+          var url = new URL(anchor.href);
+          var pathParts = url.pathname.split('/').filter(Boolean);
+          var repo = pathParts.length >= 2 ? pathParts[0] + '/' + pathParts[1] : null;
+          window.posthog.capture('outbound_github_click', {
+            repo: repo,
+            section: articleMeta.path,
+            url: anchor.href
+          });
+        } catch (e) {
+          return;
+        }
+      };
+      document.addEventListener('click', githubClickHandler);
+    })();
+  </script>
   {%- endif -%}
 </body>
 
