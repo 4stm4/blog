@@ -3,6 +3,7 @@ layout: post
 title:  "Linux kernel. Programming. Глава 4. Написание первого модуля ядра - часть 1"
 date:   2025-02-08 15:15:15 +0500
 categories: linux
+language: ru
 description: Написание первого модуля ядра - часть 1 - развитие и тестирование модулей.
 ---
 

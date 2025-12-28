@@ -3,6 +3,7 @@ layout: post
 title:  "Введение в Multiprocessing (python) с примерами"
 date:   2024-04-07 21:21:21 +0500
 categories: python
+language: ru
 ---
 
 ## Введение в Multiprocessing (python) с примерами

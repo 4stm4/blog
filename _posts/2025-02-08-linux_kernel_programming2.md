@@ -3,6 +3,7 @@ layout: post
 title:  "Linux kernel. Programming. Глава 2. Сборка ядра Linux 6.x из исходного кода – Часть 1"
 date:   2025-02-08 13:13:13 +0500
 categories: linux
+language: ru
 ---
 
 

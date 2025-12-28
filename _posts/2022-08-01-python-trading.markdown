@@ -3,6 +3,7 @@ layout: post
 title:  "traiding links"
 date:   2022-08-01 12:10:00 +0500
 categories: python
+language: en
 ---
 
 https://blog.quantinsti.com/python-trading/

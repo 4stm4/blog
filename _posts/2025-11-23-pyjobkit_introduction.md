@@ -3,6 +3,7 @@ layout: post
 title:  "Pyjobkit: Асинхронный toolkit для обработки заданий в Python"
 date:   2025-11-23 16:16:16 +0500
 categories: python
+language: ru
 ---
 
 ## Pyjobkit: Асинхронный toolkit для обработки заданий в Python

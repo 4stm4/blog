@@ -3,6 +3,7 @@ layout: post
 title:  "Введение в Threading (python) с примерами"
 date:   2024-04-07 17:17:17 +0500
 categories: python
+language: ru
 ---
 
 ## Введение в Threading (python) с примерами

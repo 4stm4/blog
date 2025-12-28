@@ -39,7 +39,7 @@ layout: default
     <div class="post-grid">
       {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
       {%- for post in posts_collection limit:6 -%}
-      <article class="post-card">
+      <article class="post-card" data-post-lang="{{ post.language | default: 'ru' }}">
         <a class="post-card-link" href="{{ post.url | relative_url }}">
           <h3 class="post-title">{{ post.title | escape }}</h3>
         </a>

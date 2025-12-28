@@ -3,6 +3,7 @@ layout: post
 title:  "Настройка NFS (Network File System) хранилища на Ubuntu Server"
 date:   2024-06-03 18:18:18 +0500
 categories: linux
+language: ru
 ---
 
 ## Настройка NFS (Network File System) хранилища на Ubuntu Server.

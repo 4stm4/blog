@@ -3,6 +3,7 @@ layout: post
 title:  "Введение в IPS/IDS/snort"
 date:   2024-02-15 21:21:21 +0500
 categories: security
+language: ru
 ---
 
 ## Введение в IPS/IDS/snort

@@ -3,6 +3,7 @@ layout: post
 title:  "Базовые знания Linux"
 date:   2024-02-13 18:18:18 +0500
 categories: linux
+language: ru
 ---
 
 ## Базовые знания Linux

@@ -3,6 +3,7 @@ layout: post
 title:  "Linux kernel. Programming. Глава 3. Построение ядра Linux версии 6.x  – Часть 2"
 date:   2025-02-08 14:14:14 +0500
 categories: linux
+language: ru
 description: Построение ядра Linux версии 6.x – часть 2 - настройка и оптимизация.
 ---
 

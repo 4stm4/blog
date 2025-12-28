@@ -3,6 +3,7 @@ layout: post
 title:  "Linux kernel. Programming. Введение. Глава 1."
 date:   2025-02-08 12:12:12 +0500
 categories: linux
+language: ru
 ---
 
 #### Программирование ядра Linux – Краткое введение

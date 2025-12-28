@@ -3,6 +3,7 @@ layout: post
 title:  "Настройка powerline в bash и tmux"
 date:   2024-01-04 16:44:44 +0500
 categories: tools
+language: ru
 ---
 
 ##### Настраиваем Powerline для bash

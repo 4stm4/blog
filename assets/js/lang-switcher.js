@@ -168,6 +168,45 @@
     });
   }
 
+  // Filter posts by language
+  function filterPostsByLanguage(lang) {
+    // Filter post cards on home page
+    document.querySelectorAll('.post-card[data-post-lang]').forEach(function(card) {
+      var postLang = card.getAttribute('data-post-lang');
+      if (postLang === lang) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Filter post links in category lists
+    document.querySelectorAll('.category-links li[data-post-lang]').forEach(function(item) {
+      var postLang = item.getAttribute('data-post-lang');
+      if (postLang === lang) {
+        item.style.display = '';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    // Update category counts after filtering
+    document.querySelectorAll('.category-card').forEach(function(card) {
+      var links = card.querySelectorAll('.category-links li[data-post-lang]');
+      var visibleCount = 0;
+      links.forEach(function(link) {
+        if (link.style.display !== 'none') {
+          visibleCount++;
+        }
+      });
+
+      var countSpan = card.querySelector('.category-summary-count');
+      if (countSpan) {
+        countSpan.textContent = visibleCount;
+      }
+    });
+  }
+
   // Set language
   function setLanguage(lang) {
     localStorage.setItem('blog-lang', lang);
@@ -184,6 +223,9 @@
 
     // Apply translations
     applyTranslations(lang);
+
+    // Filter posts by language
+    filterPostsByLanguage(lang);
   }
 
   // Initialize language on page load

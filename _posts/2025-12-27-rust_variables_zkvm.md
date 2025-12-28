@@ -2,7 +2,8 @@
 layout: post
 title:  "Переменные, память и безопасность Rust в zero-knowledge системах"
 date:   2025-12-27 23:23:23 +0500
-categories: zkVM Rust
+categories: Rust
+language: ru
 ---
 
 # Переменные, память и безопасность Rust в zero-knowledge системах

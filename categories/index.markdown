@@ -18,7 +18,7 @@ description: "Подборки статей по ключевым темам: Li
       <ul class="category-links">
         {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
   {%- for post in posts_in_category -%}
-        <li>
+        <li data-post-lang="{{ post.language | default: 'ru' }}">
           <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
         </li>

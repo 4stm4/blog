@@ -3,6 +3,7 @@ layout: post
 title:  "LVM на raspberry pi 4: создание логического диска из нескольких дисков"
 date:   2024-05-18 01:01:01 +0500
 categories: linux
+language: ru
 ---
 
 

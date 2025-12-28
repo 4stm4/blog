@@ -3,6 +3,7 @@ layout: post
 title:  "Установка ОС на внутреннюю память Orange Pi cm4"
 date:   2024-09-28 22:22:22 +0500
 categories: hardware
+language: ru
 ---
 
 ### Инструкция по форматированию eMMC памяти на Orange Pi и копированию образа на встроенную память:

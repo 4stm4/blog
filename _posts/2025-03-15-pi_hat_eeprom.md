@@ -3,6 +3,7 @@ layout: post
 title:  "Использование FT24C32A-ESR-T в Raspberry Pi HAT"
 date:   2025-03-15 16:16:00 +0500
 categories: hardware
+language: ru
 ---
 
 

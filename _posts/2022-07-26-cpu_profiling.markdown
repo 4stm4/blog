@@ -3,6 +3,7 @@ layout: post
 title:  "python CPU profiling"
 date:   2022-07-26 16:00:56 +0500
 categories: python
+language: en
 ---
 
 #### CPU profiling in `python`

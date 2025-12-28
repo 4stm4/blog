@@ -3,6 +3,7 @@ layout: post
 title:  "Краткий экскурс в модули в Linux"
 date:   2025-06-10 22:22:22 +0500
 categories: linux
+language: ru
 ---
 
 ## Загрузка и выгрузка модулей ядра Linux
