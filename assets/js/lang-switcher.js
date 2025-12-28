@@ -62,7 +62,8 @@
           meta1: "описание стендов и подключения",
           meta2: "сбор телеметрии и логов",
           meta3: "быстрые отчёты о регрессиях",
-          cta: "Открыть репозиторий"
+          cta: "Открыть репозиторий",
+          status: "В работе"
         }
       }
     },
@@ -124,7 +125,8 @@
           meta1: "test stand and connection descriptions",
           meta2: "telemetry and log collection",
           meta3: "quick regression reports",
-          cta: "Open repository"
+          cta: "Open repository",
+          status: "In Progress"
         }
       }
     }

@@ -16,14 +16,21 @@ description: "Знакомство с блогом 4stm4, список акту�
     <div class="project-grid">
       <article class="project-card">
         <div class="project-card__badge" data-i18n="projects.pyjobkit.badge">Python toolkit</div>
-        <h3 class="project-card__title"><a href="https://github.com/4stm4/pyjobkit">pyjobkit</a></h3>
+        <h3 class="project-card__title">
+          <a href="https://github.com/4stm4/pyjobkit">pyjobkit</a>
+          <span class="project-version">v0.1.0</span>
+        </h3>
         <p class="project-card__lead" data-i18n="projects.pyjobkit.lead">Набор утилит для фоновых заданий, пакетных обработок и пайплайнов, которые запускаются локально или в контейнерах.</p>
         <ul class="project-card__meta">
           <li data-i18n="projects.pyjobkit.meta1">минималистичное API для воркеров</li>
           <li data-i18n="projects.pyjobkit.meta2">управление задачами как кодом</li>
           <li data-i18n="projects.pyjobkit.meta3">удобное наблюдение за прогрессом</li>
         </ul>
-        <a class="project-card__cta" href="https://github.com/4stm4/pyjobkit" target="_blank" rel="noopener" data-i18n="projects.pyjobkit.cta">Открыть репозиторий</a>
+        <div class="project-card__actions">
+          <a class="project-card__cta" href="https://github.com/4stm4/pyjobkit" target="_blank" rel="noopener" data-i18n="projects.pyjobkit.cta">Открыть репозиторий</a>
+          <a class="project-card__cta project-card__cta--secondary" href="https://pypi.org/project/pyjobkit/" target="_blank" rel="noopener">PyPI</a>
+          <a class="project-card__cta project-card__cta--secondary" href="https://github.com/4stm4/pyjobkit-loadtest" target="_blank" rel="noopener">Benchmark</a>
+        </div>
       </article>
 
       <article class="project-card">
@@ -46,7 +53,10 @@ description: "Знакомство с блогом 4stm4, список акту�
 
       <article class="project-card">
         <div class="project-card__badge" data-i18n="projects.testum.badge">Lab automation</div>
-        <h3 class="project-card__title"><a href="https://github.com/4stm4/testum">testum</a></h3>
+        <h3 class="project-card__title">
+          <a href="https://github.com/4stm4/testum">testum</a>
+          <span class="project-status" data-i18n="projects.testum.status">В работе</span>
+        </h3>
         <p class="project-card__lead" data-i18n="projects.testum.lead">Сценарии и инструменты для автоматизации испытаний экспериментальных плат, прошивок и драйверов.</p>
         <ul class="project-card__meta">
           <li data-i18n="projects.testum.meta1">описание стендов и подключения</li>
