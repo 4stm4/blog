@@ -35,6 +35,35 @@
       post: {
         liked_article: "Понравилась статья? Напишите автору на",
         share_link: "или поделитесь ссылкой — это помогает блогу развиваться."
+      },
+      projects: {
+        intro_text: "Здесь собраны конспекты, инструкции и пошаговые эксперименты для тех, кто настраивает инфраструктуру, пишет код, внедряет системы безопасности и любит разбираться в железе. Свежие заметки выходят регулярно — заглядывайте чаще!",
+        header_title: "Открытые проекты 4stm4",
+        header_subtitle: "Инструменты, которыми можно пользоваться прямо сейчас — от фоновых пайплайнов до лаборатории для проверки железа.",
+        pyjobkit: {
+          badge: "Python toolkit",
+          lead: "Набор утилит для фоновых заданий, пакетных обработок и пайплайнов, которые запускаются локально или в контейнерах.",
+          meta1: "минималистичное API для воркеров",
+          meta2: "управление задачами как кодом",
+          meta3: "удобное наблюдение за прогрессом",
+          cta: "Открыть репозиторий"
+        },
+        ehatrom: {
+          badge: "Rust crate",
+          lead: "Библиотека для генерации и анализа EEPROM-образов Raspberry Pi HAT с аккуратной моделью TLV-записей.",
+          meta1: "готовые типы `HatEeprom`, `TlvRecord`, `TlvType`",
+          meta2: "валидация структуры TLV перед прошивкой",
+          meta3: "без ручного редактирования hex-файлов",
+          cta: "Открыть репозиторий"
+        },
+        testum: {
+          badge: "Lab automation",
+          lead: "Сценарии и инструменты для автоматизации испытаний экспериментальных плат, прошивок и драйверов.",
+          meta1: "описание стендов и подключения",
+          meta2: "сбор телеметрии и логов",
+          meta3: "быстрые отчёты о регрессиях",
+          cta: "Открыть репозиторий"
+        }
       }
     },
     en: {
@@ -68,6 +97,35 @@
       post: {
         liked_article: "Liked this article? Write to the author at",
         share_link: "or share the link — it helps the blog grow."
+      },
+      projects: {
+        intro_text: "Here you'll find notes, tutorials, and step-by-step experiments for those who set up infrastructure, write code, implement security systems, and love diving into hardware. Fresh posts appear regularly — check back often!",
+        header_title: "4stm4 Open Source Projects",
+        header_subtitle: "Tools you can use right now — from background pipelines to hardware testing labs.",
+        pyjobkit: {
+          badge: "Python toolkit",
+          lead: "A set of utilities for background jobs, batch processing, and pipelines that run locally or in containers.",
+          meta1: "minimalist API for workers",
+          meta2: "manage tasks as code",
+          meta3: "convenient progress monitoring",
+          cta: "Open repository"
+        },
+        ehatrom: {
+          badge: "Rust crate",
+          lead: "A library for generating and analyzing Raspberry Pi HAT EEPROM images with a clean TLV record model.",
+          meta1: "ready-to-use `HatEeprom`, `TlvRecord`, `TlvType` types",
+          meta2: "TLV structure validation before flashing",
+          meta3: "no manual hex file editing",
+          cta: "Open repository"
+        },
+        testum: {
+          badge: "Lab automation",
+          lead: "Scripts and tools for automating tests of experimental boards, firmware, and drivers.",
+          meta1: "test stand and connection descriptions",
+          meta2: "telemetry and log collection",
+          meta3: "quick regression reports",
+          cta: "Open repository"
+        }
       }
     }
   };

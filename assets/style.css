@@ -320,14 +320,49 @@ a:focus {
   color: var(--select-color);
 }
 
-.project-card__cta {
+.project-version {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(122, 191, 157, 0.9);
+  background: rgba(122, 191, 157, 0.15);
+  border: 1px solid rgba(122, 191, 157, 0.3);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.project-card__actions {
   margin-top: auto;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.project-card__cta {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  flex: 1;
+  min-width: fit-content;
+}
+
+.project-card__cta--secondary {
+  background: rgba(122, 191, 157, 0.1);
+  border: 1px solid rgba(122, 191, 157, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex: 0;
+}
+
+.project-card__cta--secondary:hover {
+  background: rgba(122, 191, 157, 0.2);
+  border-color: rgba(122, 191, 157, 0.5);
 }
 
 .project-card__cta::after {
@@ -338,6 +373,10 @@ a:focus {
 .project-card__cta:hover::after,
 .project-card__cta:focus::after {
   transform: translateX(4px);
+}
+
+.project-card__cta--secondary::after {
+  content: "↗";
 }
 
 .section-heading {
