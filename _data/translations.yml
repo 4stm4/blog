@@ -1,0 +1,63 @@
+ru:
+  site_title: "this_is_the_way"
+  site_description: "Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании."
+  nav:
+    home: "Главная"
+    categories: "Категории"
+    projects: "Проекты"
+    contact: "Связаться"
+  footer:
+    about_title: "О блоге"
+    about_text: "Практические заметки о Linux, инфраструктуре, встраиваемых системах и инженерных экспериментах для разработчиков и сисадминов."
+    all_topics: "Все темы"
+    write_author: "Написать автору"
+    subscription: "Подписка"
+    made_with: "Сделано с любовью к инженерии."
+  home:
+    all_categories: "Все категории"
+    materials_count: "материалов"
+    new_materials: "Новые материалы"
+    select_by_interests: "Выбрать по интересам"
+    read_more: "Читать далее"
+    subscribe_heading: "Подпишитесь на обновления"
+    subscribe_text: "Получайте свежие инструкции и обзоры о Linux, Raspberry Pi, сетевой безопасности и архитектуре систем. Без спама — только дело."
+    get_news: "Получать новости"
+    get_via_rss: "Получать через RSS"
+    subscribe_email_subject: "Подписка на блог"
+  post:
+    liked_article: "Понравилась статья? Напишите автору на"
+    share_link: "или поделитесь ссылкой — это помогает блогу развиваться."
+  skip_to_content: "Перейти к содержимому"
+  main_navigation: "Основная навигация"
+
+en:
+  site_title: "this_is_the_way"
+  site_description: "Technical blog of an engineer about Linux, DevOps, embedded systems and practical programming."
+  nav:
+    home: "Home"
+    categories: "Categories"
+    projects: "Projects"
+    contact: "Contact"
+  footer:
+    about_title: "About the blog"
+    about_text: "Practical notes about Linux, infrastructure, embedded systems and engineering experiments for developers and sysadmins."
+    all_topics: "All topics"
+    write_author: "Contact author"
+    subscription: "Subscribe"
+    made_with: "Made with love for engineering."
+  home:
+    all_categories: "All categories"
+    materials_count: "posts"
+    new_materials: "Recent posts"
+    select_by_interests: "Browse by interest"
+    read_more: "Read more"
+    subscribe_heading: "Subscribe to updates"
+    subscribe_text: "Get fresh tutorials and reviews about Linux, Raspberry Pi, network security and system architecture. No spam — just the good stuff."
+    get_news: "Get updates"
+    get_via_rss: "Subscribe via RSS"
+    subscribe_email_subject: "Blog subscription"
+  post:
+    liked_article: "Liked this article? Write to the author at"
+    share_link: "or share the link — it helps the blog grow."
+  skip_to_content: "Skip to content"
+  main_navigation: "Main navigation"

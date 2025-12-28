@@ -1,6 +1,8 @@
 ---
 layout: default
 ---
+{%- assign current_lang = site.lang | default: 'ru' -%}
+{%- assign t = site.data.translations[current_lang] -%}
 <article class="post-article">
   <header class="post-header">
     {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
@@ -24,6 +26,6 @@ layout: default
     {{ content }}
   </div>
   <footer class="post-footer">
-    <p class="post-footer-text">Понравилась статья? Напишите автору на <a href="mailto:{{ site.email }}">{{ site.email }}</a> или поделитесь ссылкой — это помогает блогу развиваться.</p>
+    <p class="post-footer-text">{{ t.post.liked_article }} <a href="mailto:{{ site.email }}">{{ site.email }}</a> {{ t.post.share_link }}</p>
   </footer>
 </article>

@@ -25,6 +25,8 @@ url: "https://4stm4.ru/" # the base hostname & protocol for your site, e.g. http
 description: >-
   Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании.
 lang: ru
+languages: ["ru", "en"]
+default_lang: ru
 timezone: Europe/Moscow
 author:
   name: "4stm4"
