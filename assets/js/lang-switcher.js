@@ -142,6 +142,12 @@
     }
   };
 
+  function capture(eventName, props) {
+    if (typeof window === 'undefined') return;
+    if (!(window.posthog && typeof window.posthog.capture === 'function')) return;
+    window.posthog.capture(eventName, props || {});
+  }
+
   // Get current language from localStorage or default to 'ru'
   function getCurrentLang() {
     return localStorage.getItem('blog-lang') || 'ru';
@@ -239,7 +245,16 @@
     document.querySelectorAll('.lang-switcher button').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var lang = this.getAttribute('data-lang');
+        var previousLang = getCurrentLang();
+        if (lang === previousLang) {
+          return;
+        }
         setLanguage(lang);
+        capture('language_switch', {
+          from: previousLang,
+          to: lang,
+          path: window.location.pathname
+        });
       });
     });
   }
