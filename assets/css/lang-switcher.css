@@ -41,11 +41,29 @@
 
 /* Responsive styles */
 @media (max-width: 768px) {
+  .lang-switcher {
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .lang-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+}
+
+@media (max-width: 600px) {
   .nav-item-lang {
-    margin-left: 0;
+    margin-left: auto !important;
   }
 
   .lang-switcher {
-    margin-top: 8px;
+    padding: 2px;
+  }
+
+  .lang-btn {
+    padding: 3px 6px;
+    font-size: 10px;
   }
 }
