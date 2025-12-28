@@ -65,6 +65,11 @@
           cta: "Открыть репозиторий",
           status: "В работе"
         }
+      },
+      categories: {
+        page_heading: "Категории блога",
+        page_intro: "Мы собрали материалы в пять основных направлений — Linux, Programming, Hardware, Security и Tools — чтобы быстрее находить нужные инструкции, конспекты и примеры.",
+        materials_with_guides: "материалов с пошаговыми инструкциями и аналитикой."
       }
     },
     en: {
@@ -128,6 +133,11 @@
           cta: "Open repository",
           status: "In Progress"
         }
+      },
+      categories: {
+        page_heading: "Blog Categories",
+        page_intro: "We've organized materials into five main areas — Linux, Programming, Hardware, Security, and Tools — to help you quickly find the guides, notes, and examples you need.",
+        materials_with_guides: "posts with step-by-step guides and analysis."
       }
     }
   };
