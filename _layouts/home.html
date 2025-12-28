@@ -7,7 +7,7 @@ layout: default
   {%- if site.categories and site.categories.size > 0 -%}
   <section class="topic-section" aria-label="Категории блога">
     <div class="section-heading">
-      <a class="section-link" href="{{ '/categories/' | relative_url }}">{{ t.home.all_categories }}</a>
+      <a class="section-link" href="{{ '/categories/' | relative_url }}" data-i18n="home.all_categories">Все категории</a>
     </div>
     <div class="topic-grid">
       {%- assign sorted_categories = site.categories | sort -%}
@@ -17,7 +17,7 @@ layout: default
       {%- assign category_anchor = category_name | slugify -%}
       <a class="topic-chip" href="{{ '/categories/#' | append: category_anchor | relative_url }}">
         <span class="topic-name">{{ category_name | replace: '_', ' ' | capitalize }}</span>
-        <span class="topic-count">{{ posts_in_category | size }} {{ t.home.materials_count }}</span>
+        <span class="topic-count">{{ posts_in_category | size }} <span data-i18n="home.materials_count">материалов</span></span>
       </a>
       {%- endfor -%}
     </div>
@@ -33,8 +33,8 @@ layout: default
   {%- if posts_collection and posts_collection.size > 0 -%}
   <section class="posts-section" aria-labelledby="posts-heading">
     <div class="section-heading">
-      <h2 id="posts-heading">{{ t.home.new_materials }}</h2>
-      <a class="section-link" href="{{ '/categories/' | relative_url }}">{{ t.home.select_by_interests }}</a>
+      <h2 id="posts-heading" data-i18n="home.new_materials">Новые материалы</h2>
+      <a class="section-link" href="{{ '/categories/' | relative_url }}" data-i18n="home.select_by_interests">Выбрать по интересам</a>
     </div>
     <div class="post-grid">
       {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
@@ -55,7 +55,7 @@ layout: default
           {%- endif -%}
         </p>
         <p class="post-excerpt">{{ post.description | default: post.excerpt | strip_html | truncate: 160 }}</p>
-        <a class="post-readmore" href="{{ post.url | relative_url }}" aria-label="Читать статью {{ post.title | escape }}">{{ t.home.read_more }}</a>
+        <a class="post-readmore" href="{{ post.url | relative_url }}" aria-label="Читать статью {{ post.title | escape }}" data-i18n="home.read_more">Читать далее</a>
       </article>
       {%- endfor -%}
     </div>
@@ -65,12 +65,12 @@ layout: default
   <section id="subscribe" class="subscribe-section" aria-labelledby="subscribe-heading">
     <div class="subscribe-inner">
       <div>
-        <h2 id="subscribe-heading">{{ t.home.subscribe_heading }}</h2>
-        <p>{{ t.home.subscribe_text }}</p>
+        <h2 id="subscribe-heading" data-i18n="home.subscribe_heading">Подпишитесь на обновления</h2>
+        <p data-i18n="home.subscribe_text">Получайте свежие инструкции и обзоры о Linux, Raspberry Pi, сетевой безопасности и архитектуре систем. Без спама — только дело.</p>
       </div>
       <div class="subscribe-actions">
-        <a class="btn-primary" href="mailto:{{ site.email }}?subject={{ t.home.subscribe_email_subject | url_encode }}">{{ t.home.get_news }}</a>
-        <a class="btn-secondary" href="{{ '/feed.xml' | relative_url }}">{{ t.home.get_via_rss }}</a>
+        <a class="btn-primary" href="mailto:{{ site.email }}?subject=Подписка%20на%20блог" data-i18n="home.get_news">Получать новости</a>
+        <a class="btn-secondary" href="{{ '/feed.xml' | relative_url }}" data-i18n="home.get_via_rss">Получать через RSS</a>
       </div>
     </div>
   </section>

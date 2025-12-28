@@ -5,7 +5,7 @@
 {%- assign t = site.data.translations[current_lang] -%}
 
 <body class="site-body">
-  <a class="skip-link" href="#main-content">{{ t.skip_to_content }}</a>
+  <a class="skip-link" href="#main-content" data-i18n="skip_to_content">Перейти к содержимому</a>
   <header class="site-header">
     <div class="container-xl">
       <div class="header-inner">
@@ -13,13 +13,13 @@
           <span class="material-symbols-outlined brand-icon" aria-hidden="true">hub</span>
           <span class="brand-name">{{ site.title | escape }}</span>
         </a>
-        <p class="brand-tagline">{{ t.site_description }}</p>
-        <nav class="primary-nav" aria-label="{{ t.main_navigation }}">
+        <p class="brand-tagline" data-i18n="site_description">Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании.</p>
+        <nav class="primary-nav" aria-label="Основная навигация">
           <ul class="nav-list">
-            <li class="nav-item"><a class="nav-link{% if page.url == '/' %} is-active{% endif %}" href="{{ '/' | relative_url }}">{{ t.nav.home }}</a></li>
-            <li class="nav-item"><a class="nav-link{% if page.url contains '/categories' %} is-active{% endif %}" href="{{ '/categories/' | relative_url }}">{{ t.nav.categories }}</a></li>
-            <li class="nav-item"><a class="nav-link{% if page.url contains '/intro' %} is-active{% endif %}" href="{{ '/intro/' | relative_url }}">{{ t.nav.projects }}</a></li>
-            <li class="nav-item nav-item-cta"><a class="nav-link" href="mailto:{{ site.email }}">{{ t.nav.contact }}</a></li>
+            <li class="nav-item"><a class="nav-link{% if page.url == '/' %} is-active{% endif %}" href="{{ '/' | relative_url }}" data-i18n="nav.home">Главная</a></li>
+            <li class="nav-item"><a class="nav-link{% if page.url contains '/categories' %} is-active{% endif %}" href="{{ '/categories/' | relative_url }}" data-i18n="nav.categories">Категории</a></li>
+            <li class="nav-item"><a class="nav-link{% if page.url contains '/intro' %} is-active{% endif %}" href="{{ '/intro/' | relative_url }}" data-i18n="nav.projects">Проекты</a></li>
+            <li class="nav-item nav-item-cta"><a class="nav-link" href="mailto:{{ site.email }}" data-i18n="nav.contact">Связаться</a></li>
             <li class="nav-item nav-item-lang">
               <div class="lang-switcher">
                 <button type="button" class="lang-btn" data-lang="ru" aria-label="Русский">RU</button>
@@ -41,16 +41,16 @@
   <footer class="site-footer">
     <div class="container-xl footer-content">
       <div>
-        <h2 class="footer-title">{{ t.footer.about_title }}</h2>
-        <p>{{ t.footer.about_text }}</p>
+        <h2 class="footer-title" data-i18n="footer.about_title">О блоге</h2>
+        <p data-i18n="footer.about_text">Практические заметки о Linux, инфраструктуре, встраиваемых системах и инженерных экспериментах для разработчиков и сисадминов.</p>
       </div>
       <div class="footer-meta">
         <ul class="footer-links">
-          <li><a href="{{ '/categories/' | relative_url }}">{{ t.footer.all_topics }}</a></li>
-          <li><a href="mailto:{{ site.email }}">{{ t.footer.write_author }}</a></li>
-          <li><a href="{{ '/' | relative_url }}#subscribe">{{ t.footer.subscription }}</a></li>
+          <li><a href="{{ '/categories/' | relative_url }}" data-i18n="footer.all_topics">Все темы</a></li>
+          <li><a href="mailto:{{ site.email }}" data-i18n="footer.write_author">Написать автору</a></li>
+          <li><a href="{{ '/' | relative_url }}#subscribe" data-i18n="footer.subscription">Подписка</a></li>
         </ul>
-        <p class="footer-copy">© {{ site.time | date: '%Y' }} {{ site.title | escape }}. {{ t.footer.made_with }}</p>
+        <p class="footer-copy">© {{ site.time | date: '%Y' }} {{ site.title | escape }}. <span data-i18n="footer.made_with">Сделано с любовью к инженерии.</span></p>
       </div>
     </div>
   </footer>
