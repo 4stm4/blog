@@ -1,6 +1,5 @@
 ru:
   site_title: "this_is_the_way"
-  site_description: "Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании."
   nav:
     home: "Главная"
     categories: "Категории"
@@ -32,7 +31,6 @@ ru:
 
 en:
   site_title: "this_is_the_way"
-  site_description: "Technical blog of an engineer about Linux, DevOps, embedded systems and practical programming."
   nav:
     home: "Home"
     categories: "Categories"

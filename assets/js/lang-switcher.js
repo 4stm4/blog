@@ -6,7 +6,6 @@
   var translations = {
     ru: {
       skip_to_content: "Перейти к содержимому",
-      site_description: "Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании.",
       nav: {
         home: "Главная",
         categories: "Категории",
@@ -74,7 +73,6 @@
     },
     en: {
       skip_to_content: "Skip to content",
-      site_description: "Technical blog of an engineer about Linux, DevOps, embedded systems and practical programming.",
       nav: {
         home: "Home",
         categories: "Categories",
