@@ -748,6 +748,33 @@ code {
   right: 8px;
   top: 8px;
   z-index: 10;
+  background: rgba(3, 0, 12, 0.85);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.zeroclipboard-container clipboard-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem;
+  border-radius: inherit;
+}
+
+.zeroclipboard-container svg {
+  fill: var(--text-color);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.zeroclipboard-container .octicon-check {
+  fill: #66ffc9;
+}
+
+.zeroclipboard-container clipboard-copy:focus-visible svg,
+.zeroclipboard-container clipboard-copy:hover svg {
+  transform: scale(1.08);
+  opacity: 0.9;
 }
 
 .badge {
