@@ -738,12 +738,8 @@ code {
   overflow-x: auto;
 }
 
-.snippet-clipboard-content:hover .zeroclipboard-container {
-  display: block;
-}
-
 .zeroclipboard-container {
-  display: none;
+  display: inline-flex;
   position: absolute;
   right: 8px;
   top: 8px;
@@ -752,6 +748,13 @@ code {
   border: 1px solid var(--border-color);
   border-radius: 999px;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  opacity: 0.45;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.snippet-clipboard-content:hover .zeroclipboard-container,
+.zeroclipboard-container:focus-within {
+  opacity: 1;
 }
 
 .zeroclipboard-container clipboard-copy {

@@ -21,7 +21,9 @@
 title: this_is_the_way
 email: i@4stm4.ru
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://4stm4.ru/" # the base hostname & protocol for your site, e.g. http://example.com
+# Do not end `url` with a trailing slash, otherwise canonical URLs and the sitemap
+# will get double slashes (//path) that confuse search engines.
+url: "https://4stm4.ru" # the base hostname & protocol for your site, e.g. http://example.com
 description: >-
   Технический блог инженера о Linux, DevOps, встраиваемых системах и практическом программировании.
 lang: ru
