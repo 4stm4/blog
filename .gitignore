@@ -1,12 +1,22 @@
-_site
-.sass-cache
-.jekyll-cache
+# Build output
+_site/
+.jekyll-cache/
 .jekyll-metadata
-vendor
-node_modules
+.sass-cache/
+vendor/
+node_modules/
+build/
+dist/
+.bundle/
+
+# Local config
 _config.yml
-__pycache__
+
+# Python cache
+__pycache__/
 __pycache__/code.cpython-39.pyc
+
+# OS junk
 .DS_Store
 .DS_Store
-.DS_Store
+.claude/worktrees/jolly-tereshkova-eb18ff/
