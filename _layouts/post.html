@@ -1,31 +1,37 @@
 ---
 layout: default
 ---
-{%- assign current_lang = site.lang | default: 'ru' -%}
-{%- assign t = site.data.translations[current_lang] -%}
-<article class="post-article">
-  <header class="post-header">
-    {%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
-    <p class="post-header-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: date_format }}</time>
-      {%- if page.categories and page.categories.size > 0 -%}
-      ·
-      <span class="post-header-categories">
-        {%- for category in page.categories -%}
-        <a href="{{ '/categories/#' | append: category | slugify | relative_url }}">{{ category | replace: '_', ' ' | capitalize }}</a>{% unless forloop.last %}, {% endunless %}
-        {%- endfor -%}
-      </span>
-      {%- endif -%}
-    </p>
-    <h1 class="post-header-title">{{ page.title | escape }}</h1>
-    {%- if page.description -%}
-    <p class="post-header-description">{{ page.description }}</p>
-    {%- endif -%}
-  </header>
-  <div class="post-content">
-    {{ content }}
-  </div>
-  <footer class="post-footer">
-    <p class="post-footer-text"><span data-i18n="post.liked_article">Понравилась статья? Напишите автору на</span> <a href="mailto:{{ site.email }}">{{ site.email }}</a> <span data-i18n="post.share_link">или поделитесь ссылкой — это помогает блогу развиваться.</span></p>
-  </footer>
+{%- assign current_lang = page.language | default: site.lang | default: 'ru' -%}
+{%- assign date_format = site.minima.date_format | default: "%d.%m.%Y" -%}
+{%- assign read_min = page.content | number_of_words | divided_by: 200 | plus: 1 -%}
+
+<div class="win-prompt">
+  <span class="p-user">root</span><span class="p-sep">@</span><span class="p-host">4stm4</span><span class="p-sep">:</span><span class="p-path">~/{{ page.categories | first | default: 'posts' | slugify }}</span> $ <span class="p-cmd">cat {{ page.slug | default: page.name }}.md</span>
+</div>
+
+<div class="post-meta-bar">
+  <span class="post-meta-date">{{ page.date | date: date_format }}</span>
+  {%- for cat in page.categories -%}
+  <span class="post-meta-cat">
+    <a href="{{ '/categories/#' | append: cat | slugify | relative_url }}">{{ cat | replace: '_', ' ' }}</a>
+  </span>
+  {%- endfor -%}
+  <span class="post-meta-rt">~{{ read_min }}min read</span>
+</div>
+
+<div class="post-progressbar">
+  <div class="post-progress-fill"></div>
+</div>
+
+<article class="term-md">
+  <h1 class="post-title-h1">{{ page.title | escape }}</h1>
+  {%- if page.description -%}
+  <p class="post-desc">{{ page.description }}</p>
+  {%- endif -%}
+  {{ content }}
 </article>
+
+<div class="post-footer-bar">
+  <a href="mailto:{{ site.email }}">✉ {{ site.email }}</a>
+  <a href="{{ '/' | relative_url }}">← index</a>
+</div>
