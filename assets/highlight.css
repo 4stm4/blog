@@ -1,145 +1,35 @@
-:root {
-    --active-color: #e2b714;
-    --bg-color-light: #45484c;
-    --select-color: #cb5800;
-    --border-color: #4f5459;
-    --border-color-light: #8b949e;
-    --bg-color: #060c09;
-    --sub-color: #272727;
-  }
-  
+/* Syntax highlighting + code block labels — Terminal Archive palette */
 
-.language-python .highlight .kn{
-    color: rgb(221, 72, 247);
-}
-.language-python .highlight .nn{
-    color: rgb(88, 227, 99);
-}
-
-.language-python .highlight .n{
-    color: rgb(144, 206, 247);
-}
-.language-python .highlight .k{
-    color: rgb(247, 215, 110);
-}
-.language-python .highlight .p{
-    color: rgb(240, 193, 38);
-}
-.language-python .highlight .s{
-    color: rgb(247, 104, 72);
-}
+/* Python token colours */
+.language-python .highlight .kn { color: #EFB8C8; }
+.language-python .highlight .nn { color: #81C784; }
+.language-python .highlight .n  { color: #CAC4D0; }
+.language-python .highlight .k  { color: #D0BCFF; }
+.language-python .highlight .p  { color: #CCC2DC; }
+.language-python .highlight .s  { color: #A8DAB5; }
 
 .language-python {
-    margin: 10px 0px 10px 0px;
-    padding: 0px;
-    font-size: 10px;
-    color: #8b949e;
-    display: block;
-    position: relative !important;
-    max-width: 100%;
+  margin: 10px 0;
+  padding: 0;
+  font-size: 12px;
+  color: #CAC4D0;
+  display: block;
+  position: relative;
+  max-width: 100%;
 }
-.python-label {
-    color: var(--bg-color);
-    margin: 0px;
-    padding: 3px 8px;
-    position: absolute !important;
-    top: 8px;
-    right: 8px;
-    background-color: var(--border-color-light);
-    border-radius: 4px;
-    font-size: 10px;
-    z-index: 5;
-    pointer-events: none;
-}
-.highlight{
-    font-size: 14px;
-}
-.output-wrap {
-    margin: 10px 0px 10px 0px;
-    display: block;
-    position: relative !important;
-    max-width: 100%;
-}
-.output {
-    background-color: var(--sub-color);
-    border-radius: 6px;
-    overflow-x: auto;
-    max-width: 100%;
-}
-.output-label {
-    font-size: 10px;
-    margin: 0px;
-    padding: 3px 5px;
-    text-orientation: upright;
-    writing-mode: vertical-lr; 
-    top: 0px;
-    left: 0px;
-    position: absolute !important;
-    z-index: 5;
-}
-blockquote {
-    margin: 0px 0px 0px 20px;
-    padding: 17px 5px 17px 15px;
-    background-color: var(--bg-color-light);
-    border-radius: 0px 6px 6px 0px;
-    overflow-x: auto;
-    max-width: calc(100% - 20px);
-}
-.cmd-wrap {
-    display: block;
-    position: relative !important;
-    max-width: 100%;
-}
-.cmd-label {
-    color: var(--bg-color);
-    font-size: 10px;
-    margin: 0px;
-    padding: 3px 8px;
-    position: absolute !important;
-    top: 8px;
-    right: 8px;
-    background-color: var(--border-color-light);
-    border-radius: 4px;
-    z-index: 5;
-    pointer-events: none;
-}
-li::marker {
-    color: var(--select-color);
-    font-weight: 900;
-    font-size: large;
-  }
 
-  .img-wrap {
-    margin: 10px 0px 10px 0px;
-    padding: 0px;
-    display: block;
-    position: relative !important;
-    background-color: var(--sub-color);
-    border-radius: 6px;
-    border: 1px;
-    border-style: solid;
-    border-color: var(--border-color);
-    max-width: 100%;
-    overflow: hidden;
-}
-.img-label {
-    font-size: 10px;
-    margin: 0px;
-    padding: 3px 5px;
-    text-orientation: upright;
-    writing-mode: vertical-lr; 
-    top: 0px;
-    left: 0px;
-    position: absolute !important;
-    z-index: 5;
+.highlight { font-size: 12px; }
+
+li::marker {
+  color: #D0BCFF;
+  font-weight: 700;
 }
 
 img {
-    margin: 0px 0px 0px 20px;
-    padding: 0px 20px 0px 20px;
-    background-color: var(--bg-color-light);
-    border-radius: 0px 6px 6px 0px;
-    background-size: 100%;
-    max-width: calc(100% - 40px);
-    height: auto;
+  max-width: calc(100% - 20px);
+  height: auto;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
 }
