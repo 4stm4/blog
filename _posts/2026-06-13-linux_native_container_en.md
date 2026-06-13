@@ -1,10 +1,12 @@
 ---
 layout: post
-title:  "Построение контейнера «с нуля» с Linux-namespace и cgroups"
+title:  "Building a container from scratch with Linux namespaces and cgroups"
 date:   2026-06-13 17:17:17 +0500
 categories: Linux
 language: en
 ---
+
+# Building a container from scratch with Linux namespaces and cgroups
 
 # Executive Summary  
 A Linux **container** is essentially a normal process that has a _restricted view_ of the host system, achieved by kernel features rather than full hardware emulation.  Containers share the host’s kernel but use **namespaces** to isolate resources (process IDs, network, filesystems, etc.) and **cgroups** to limit resource usage.  This guide shows how to build a native container “from scratch” using the `unshare` and `chroot` commands on a modern Linux system. We explain the theory (namespaces, cgroups, and `/proc`), step-by-step commands to create a basic container, how to add networking (veth/bridge/NAT), how to apply cgroup limits, and the security implications.  We include code examples, comparison tables, a troubleshooting checklist, and diagrams to illustrate concepts. The result will be a mini “container runtime” without Docker, useful for understanding how containers really work under the hood.
