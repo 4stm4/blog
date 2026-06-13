@@ -96,11 +96,16 @@
       var mainEl = document.getElementById('main-content');
       var sent = false;
       var read75Sent = false;
+      var track = function (eventName, props) {
+        if (window.blogAnalytics && typeof window.blogAnalytics.track === 'function') {
+          return window.blogAnalytics.track(eventName, props);
+        }
+        return false;
+      };
 
       var tryCapture = function () {
         if (sent) return;
-        if (window.posthog && typeof window.posthog.capture === 'function') {
-          window.posthog.capture('article_view', articleMeta);
+        if (track('article_view', articleMeta)) {
           sent = true;
         }
       };
@@ -121,11 +126,10 @@
         if (read75Sent || !mainEl) return;
         var progress = (mainEl.scrollTop + mainEl.clientHeight) / mainEl.scrollHeight;
         if (progress >= 0.75) {
-          if (window.posthog && typeof window.posthog.capture === 'function') {
-            window.posthog.capture('article_read_75', articleMeta);
+          if (track('article_read_75', articleMeta)) {
+            read75Sent = true;
+            mainEl.removeEventListener('scroll', onScrollRead);
           }
-          read75Sent = true;
-          mainEl.removeEventListener('scroll', onScrollRead);
         }
       };
       if (mainEl) {
@@ -144,11 +148,10 @@
       document.addEventListener('click', function (event) {
         var anchor = event.target && event.target.closest ? event.target.closest('a[href*="github.com/"]') : null;
         if (!anchor) return;
-        if (!(window.posthog && typeof window.posthog.capture === 'function')) return;
         try {
           var url = new URL(anchor.href);
           var parts = url.pathname.split('/').filter(Boolean);
-          window.posthog.capture('outbound_github_click', {
+          track('outbound_github_click', {
             repo: parts.length >= 2 ? parts[0] + '/' + parts[1] : null,
             section: articleMeta.path,
             url: anchor.href

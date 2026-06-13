@@ -142,8 +142,8 @@
 
   function capture(eventName, props) {
     if (typeof window === 'undefined') return;
-    if (!(window.posthog && typeof window.posthog.capture === 'function')) return;
-    window.posthog.capture(eventName, props || {});
+    if (!(window.blogAnalytics && typeof window.blogAnalytics.track === 'function')) return;
+    window.blogAnalytics.track(eventName, props || {});
   }
 
   // Get current language from localStorage or default to 'ru'

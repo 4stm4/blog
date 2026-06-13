@@ -1,6 +1,13 @@
-// Global PostHog helpers and additional events
+// Global Umami helpers and additional events
 (function() {
   'use strict';
+
+  var SOURCE_STORAGE_KEY = 'blog-analytics-source-props';
+  var MAX_PENDING_EVENTS = 50;
+  var pendingEvents = [];
+  var flushTimer = null;
+  var flushAttempts = 0;
+  var sourceProps = readSourceProps();
 
   function ready(fn) {
     if (document.readyState === 'loading') {
@@ -10,35 +17,129 @@
     }
   }
 
-  function capture(eventName, props) {
-    if (!(window.posthog && typeof window.posthog.capture === 'function')) {
-      return;
-    }
-    window.posthog.capture(eventName, props || {});
+  function isPlainObject(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
   }
 
-  function registerSourcesAndPageview() {
-    if (!(window.posthog && typeof window.posthog.capture === 'function')) return;
+  function readSourceProps() {
+    try {
+      if (!window.sessionStorage) return {};
+      var raw = window.sessionStorage.getItem(SOURCE_STORAGE_KEY);
+      if (!raw) return {};
+      var parsed = JSON.parse(raw);
+      return isPlainObject(parsed) ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function writeSourceProps(props) {
+    try {
+      if (window.sessionStorage) {
+        window.sessionStorage.setItem(SOURCE_STORAGE_KEY, JSON.stringify(props));
+      }
+    } catch (e) {}
+  }
+
+  function collectSourceProps() {
+    if (typeof URLSearchParams !== 'function') return {};
 
     var searchParams = new URLSearchParams(window.location.search || '');
-    var registerProps = {};
+    var nextProps = {};
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
     keys.forEach(function(key) {
       var value = searchParams.get(key);
       if (value) {
-        registerProps[key] = value;
+        nextProps[key] = value;
       }
     });
 
     var refParam = searchParams.get('ref');
     if (refParam) {
-      registerProps.ref = refParam;
+      nextProps.ref = refParam;
     }
 
-    if (Object.keys(registerProps).length && typeof window.posthog.register === 'function') {
-      window.posthog.register(registerProps);
+    if (Object.keys(nextProps).length) {
+      sourceProps = Object.assign({}, sourceProps, nextProps);
+      writeSourceProps(sourceProps);
     }
 
+    return nextProps;
+  }
+
+  function getTracker() {
+    return window.umami && typeof window.umami.track === 'function' ? window.umami : null;
+  }
+
+  function normalizeProps(props) {
+    var normalized = Object.assign({}, sourceProps);
+    if (isPlainObject(props)) {
+      Object.assign(normalized, props);
+    }
+    return normalized;
+  }
+
+  function sendToUmami(eventName, props) {
+    var tracker = getTracker();
+    if (!tracker) return false;
+
+    try {
+      tracker.track(eventName, props || {});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function flush() {
+    if (!getTracker() || !pendingEvents.length) return false;
+
+    while (pendingEvents.length) {
+      var event = pendingEvents.shift();
+      if (!sendToUmami(event.name, event.props)) {
+        pendingEvents.unshift(event);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function scheduleFlush() {
+    if (flushTimer || flushAttempts >= 10) return;
+    flushTimer = window.setTimeout(function() {
+      flushTimer = null;
+      flushAttempts += 1;
+      flush();
+      if (pendingEvents.length) {
+        scheduleFlush();
+      }
+    }, 500);
+  }
+
+  function capture(eventName, props) {
+    if (!eventName) return false;
+
+    var eventProps = normalizeProps(props);
+    if (sendToUmami(eventName, eventProps)) {
+      flushAttempts = 0;
+      flush();
+      return true;
+    }
+
+    if (pendingEvents.length >= MAX_PENDING_EVENTS) return false;
+    pendingEvents.push({ name: eventName, props: eventProps });
+    scheduleFlush();
+    return true;
+  }
+
+  collectSourceProps();
+
+  window.blogAnalytics = window.blogAnalytics || {};
+  window.blogAnalytics.track = capture;
+  window.blogAnalytics.flush = flush;
+
+  function trackPageview() {
     var pageProps = {
       path: window.location.pathname || '/',
       url: window.location.href
@@ -46,10 +147,6 @@
 
     if (document.referrer) {
       pageProps.referrer = document.referrer;
-    }
-
-    if (Object.keys(registerProps).length) {
-      Object.assign(pageProps, registerProps);
     }
 
     capture('pageview', pageProps);
@@ -128,29 +225,11 @@
     }
   }
 
-  function setupFeatureFlags() {
-    if (!(window.posthog && typeof window.posthog.onFeatureFlags === 'function')) return;
-
-    window.blogFeatureFlags = window.blogFeatureFlags || {
-      flags: [],
-      isEnabled: function(flag) {
-        return this.flags.indexOf(flag) !== -1;
-      }
-    };
-
-    window.posthog.onFeatureFlags(function(flags) {
-      window.blogFeatureFlags.flags = flags || [];
-      if (document.body) {
-        document.body.setAttribute('data-feature-flags', window.blogFeatureFlags.flags.join(' '));
-      }
-    });
-  }
-
   ready(function() {
-    registerSourcesAndPageview();
+    trackPageview();
     trackNavClicks();
     trackFooterCtas();
     trackListingScroll();
-    setupFeatureFlags();
+    flush();
   });
 })();

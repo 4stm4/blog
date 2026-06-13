@@ -340,8 +340,8 @@
       if(state.index >= words.length) state.index = 0;
       if(state.playing) return;
       state.playing = true;
-      if(window.posthog && typeof window.posthog.capture === 'function') {
-        window.posthog.capture('rsvp_play');
+      if(window.blogAnalytics && typeof window.blogAnalytics.track === 'function') {
+        window.blogAnalytics.track('rsvp_play');
       }
       updatePlayPauseUi();
       if(!freqMapHolder.loaded && state.enableFreqMap){
@@ -441,7 +441,7 @@
         freqMapTimeoutMs: options.freqMapTimeoutMs,
         freqMapMaxBytes: options.freqMapMaxBytes,
         freqMapMaxEntries: options.freqMapMaxEntries,
-        _phOpened: false
+        _analyticsOpened: false
       };
       const ui = buildPanel(state, uniqueId('rsvp-panel'));
       const player = createPlayer(words, state, ui);
@@ -460,9 +460,9 @@
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         toggle.textContent = open ? 'Скрыть скорочтение' : 'Скорочтение';
         if(open){
-          if(!state._phOpened && window.posthog && typeof window.posthog.capture === 'function') {
-            window.posthog.capture('rsvp_opened');
-            state._phOpened = true;
+          if(!state._analyticsOpened && window.blogAnalytics && typeof window.blogAnalytics.track === 'function') {
+            window.blogAnalytics.track('rsvp_opened');
+            state._analyticsOpened = true;
           }
           player.updateProgress();
           (ui.playPauseBtn || ui.panel).focus();
