@@ -6,8 +6,6 @@ categories: Linux
 language: en
 ---
 
-# Building a Native Linux Container from Scratch
-
 A Linux container is essentially an ordinary process that is given a restricted view of the system via kernel features.  In practice, one creates a new **root filesystem**, and uses Linux **namespaces** and **cgroups** to isolate that process.  Unlike a VM, a container uses the same kernel as the host but “sees” different global resources.  For example, one process group might have its own filesystem root, process tree, hostname, network interfaces, and resource limits, while the host remains unchanged. The steps below show how to set this up manually using `unshare`, `chroot`, and related tools.
 
 ## 1. Why *chroot* Is Not Full Isolation
