@@ -1,5 +1,5 @@
 /*
- * RSVP Reader for 4stm4.ru
+ * RSVP Reader for 4stm4.website
  * Install: <script src="/assets/js/rsvp-reader.js" defer></script>
  * UMD/Global: window.initRsvpReader();
  * ESM build: ship a separate bundle that re-exports initRsvpReader.
@@ -522,7 +522,7 @@
   // 2) Вызовите: initRsvpReader({ selectorOverrides: { article: 'article', title: 'h1' }, defaultWpm: 250, adaptive: true });
   // 3) Кнопка появится возле заголовка статьи, панель раскрывается по клику.
 
-  // Список селекторов 4stm4.ru: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
+  // Список селекторов 4stm4.website: article, .post, main, #content, h1 — чтобы найти основную статью и заголовок без вмешательства в остальную вёрстку.
 
 })(typeof window !== 'undefined' ? window : globalThis);
 

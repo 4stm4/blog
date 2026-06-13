@@ -1,255 +1,305 @@
 ---
 layout: post
-title:  "Building a container from scratch with Linux namespaces and cgroups"
+title:  "Building a Native Linux Container (Without Docker): An In-Depth Guide"
 date:   2026-06-13 17:17:17 +0500
 categories: Linux
 language: en
 ---
 
-# Executive Summary  
-A Linux **container** is essentially a normal process that has a _restricted view_ of the host system, achieved by kernel features rather than full hardware emulation.  Containers share the host’s kernel but use **namespaces** to isolate resources (process IDs, network, filesystems, etc.) and **cgroups** to limit resource usage.  This guide shows how to build a native container “from scratch” using the `unshare` and `chroot` commands on a modern Linux system. We explain the theory (namespaces, cgroups, and `/proc`), step-by-step commands to create a basic container, how to add networking (veth/bridge/NAT), how to apply cgroup limits, and the security implications.  We include code examples, comparison tables, a troubleshooting checklist, and diagrams to illustrate concepts. The result will be a mini “container runtime” without Docker, useful for understanding how containers really work under the hood.
+**Executive Summary:** A Linux “container” is essentially a regular process that has its own isolated view of the operating system, achieved through kernel features like namespaces and cgroups. Unlike a simple `chroot`, which only changes the filesystem root and “*does nothing else*”, a true container isolates process IDs (PID), networking, user IDs, and more, giving it a mental model similar to a lightweight virtual machine. This guide explains the purpose of containers, how each Linux namespace (mount, PID, UTS, IPC, net, user, etc.) works, and walks through creating a fully-functional container from scratch on Linux. We use an Alpine Linux *mini-rootfs* for the container’s root filesystem, `unshare` and `chroot` to enter that filesystem, and set up basic networking (via a veth pair and bridge) and resource limits (via cgroups). We also cover mounting `/proc` and `/sys`, setting the hostname and UID mappings in a user namespace, example scripts, verification steps, common pitfalls, and security considerations. Throughout, we cite official documentation (man-pages, kernel docs, Alpine docs) and reputable tutorials.
 
-# Container Concepts and Mental Model  
-A container is **not** a full virtual machine – it shares the host OS kernel.  Instead, it provides **isolation** and **resource control** using Linux primitives.  In essence, a container is just a regular Linux process (or set of processes) that has been moved into new namespaces and cgroups.  Namespaces wrap global resources so that processes inside the container see their own isolated instance of those resources.  Cgroups (control groups) then **limit** and **account for** how much CPU, memory, network, etc. the container can use.
+## Purpose and Mental Model of Containers
 
-- **Namespace isolation:** Each container has its own view of system resources. For example, it sees a separate PID tree, filesystems, network interfaces, hostname, and IPC objects.  This makes processes inside the container “think” they are the only ones on the system.  
-- **Resource control:** Cgroups ensure the container can’t starve the host. A cgroup can enforce CPU shares, memory limits, I/O limits, etc., on all processes in the container.  
+A container is **not** a VM but a set of namespaces and cgroups applied to one or more processes. The **mental model** is “a process with an alternate view of the system.” Namespaces partition kernel resources so that processes in one namespace see their own set of filesystems, processes, network interfaces, etc., separate from the host or other containers. By combining namespaces and cgroups (for resource limits), a container can safely co-exist with others on the same kernel, without interfering (in well-configured setups).
 
-These two features (namespaces + cgroups) are the foundation of containerization.  Unlike a VM, a container has negligible overhead because there’s no second kernel – it just uses the existing Linux kernel with different views of it.  In user experience, it looks like a tiny Linux system (with its own PID 1, etc.), but under the hood it's simply Linux processes with restricted capabilities.
+Key points:
+- A container’s filesystem root is usually an unpacked image (we’ll use Alpine’s minirootfs). This is similar to `chroot`, but to get true isolation we also use additional namespaces.
+- **Chroot vs Container:** The traditional `chroot` call merely changes the process’s filesystem root and “does nothing else”.  It was *not* designed as a security boundary. In contrast, a container also has new PID, network, IPC, UTS, and optionally user namespaces, so that processes see only what’s inside the container. For example, in a new PID namespace, the container’s first process is PID 1, independent of the host’s PIDs.
+- Isolation: With namespaces, changes inside the container (mounts, hostname changes, etc.) do not leak to the host. For instance, the mount namespace ensures that “mounting and unmounting filesystems will not affect the rest of the system”. Similarly, a UTS namespace lets the container set its own hostname without affecting the host, and a network namespace gives it independent network interfaces and routing tables.
 
-# chroot: Changing Root, Not Full Isolation  
-The `chroot` command changes the apparent root directory (`/`) for a process. This confines filesystem access to a given directory tree. For example:  
-```bash
-sudo chroot /container /bin/sh
-```  
-makes `/container` appear as `/` inside the shell.  However, **chroot by itself is not a security or isolation mechanism**. It only affects file path resolution; it does **not** create new PID, network, user, or other namespaces. A chrooted process still runs in the same kernel, sees all the host’s processes, uses the same network stack, etc. (In fact, a root user can “escape” a simple chroot jail by using `chroot` again or other tricks.) Therefore, on its own, chroot is **insufficient for container security**. True containers use chroot (or better, pivot_root) *inside* new namespaces to isolate even the filesystem view. 
+Below we explain each relevant namespace and other pieces in detail.
 
-# Linux Namespaces: Types and Effects  
-Linux provides several namespace types, each isolating a different global resource. The most commonly used for containers are:
+## Linux Namespaces: Mount, PID, UTS, IPC, Net, User, (and Others)
 
-- **Mount namespace (`mnt`, CLONE_NEWNS):** Each namespace gets its own set of filesystem mount points. In a new mount namespace, initially all mounts from the parent are copied, but changes (mount/unmount) no longer affect the host or other namespaces. This allows a container to remount or hide parts of the filesystem without impacting the host.  
-- **PID namespace (CLONE_NEWPID):** Processes inside see their own process ID tree. The first process in a new PID namespace gets PID 1 (just like init). Orphaned processes are reparented to that PID 1. Importantly, the container’s PID 1 is distinct from the host’s PID 1. If the PID 1 inside a container exits, the kernel will kill all processes in that namespace, effectively shutting down the container.  
-- **Network namespace (`net`, CLONE_NEWNET):** Virtualizes the network stack. A new network namespace starts with only a loopback (`lo`) interface, initially down. It has its own IP addresses, routing table, firewall rules, etc. No physical interfaces are in it until you add them. Typically we create a virtual Ethernet pair (veth) to link the container’s netns to the host’s network (see below). Destroying a netns also destroys its virtual interfaces.  
-- **IPC namespace (CLONE_NEWIPC):** Isolates System V IPC and POSIX message queues. Processes in different IPC namespaces cannot see or use each other’s shared memory segments, semaphores, or message queues.  
-- **UTS namespace (CLONE_NEWUTS):** Isolates two system identifiers: the hostname and NIS domain name. Inside a UTS namespace, a process can freely change the hostname without affecting the host or other containers.  
-- **User namespace (CLONE_NEWUSER):** Provides separate UID/GID mapping. A user namespace lets a container have its own user ID space. Most importantly, the container’s root (UID 0) can be mapped to an unprivileged user ID on the host. This means a process running as “root” in the container is actually a normal user on the host, mitigating the risk if it escapes. For example, the container’s root (0) might map to host UID 100000. Even if that process breaks out of other namespaces, the kernel still treats it as UID 100000 on the host, limiting damage.  
-- **Cgroup namespace (CLONE_NEWCGROUP):** Hides the details of control group hierarchy. A process inside this namespace sees `/proc/self/cgroup` as just `/` (so it doesn’t see the host’s cgroup path), preventing information leaks. (This is a newer namespace mainly for privacy and seamless migration.)  
+The `unshare(1)` and kernel docs describe each namespace. In brief:
 
-Each namespace is independent and orthogonal: a container typically unshares a combination of namespaces so that inside it has its own PID tree, mounts, network, etc. All these namespaces are created via `clone()` or the `unshare` command (below). The manual *namespaces(7)* explains: “One use of namespaces is to implement containers”.
+- **Mount namespace (`CLONE_NEWNS`)**: Isolates filesystem mounts. In a new mount namespace, “mounting and unmounting filesystems will not affect the rest of the system”. In practice this means `mount` and `umount` inside the container stay private (unless you bind-mount with shared propagation). By default, `unshare` makes mounts private in the new namespace.
 
-# The Role of `/proc` and `--mount-proc`  
-The **proc filesystem** (`procfs`) is a virtual filesystem (/proc) that provides information about processes and the system. In a new PID namespace, `/proc` must be remounted to reflect the namespace’s view of PIDs. If you enter a new PID namespace without mounting a fresh procfs, commands like `ps` inside will still show the host’s processes, or even malfunction.
-
-The `unshare` command offers a convenient `--mount-proc` option. This does two things in one go: it unshares a new mount namespace and mounts a new `proc` filesystem for the new PID namespace. For example: 
-```bash
-unshare --fork --pid --mount-proc /bin/bash
-```
-This makes a shell in a new PID namespace with `/proc` automatically reflecting only the new namespace’s PIDs. In summary, **mounting `/proc` inside the container namespace** is critical for tools to see the correct processes and system info.
-
-# Control Groups (cgroups) and Resource Limits  
-**Control groups** allow grouping processes and enforcing resource limits on them. A cgroup can limit how much CPU time, memory, disk I/O, network bandwidth, etc. a set of processes may use. In a container, all processes usually belong to the same cgroup, so the runtime can restrict the entire container’s resource usage.
-
-Cgroups have evolved: 
-- **v1:** Separate hierarchies for each resource (e.g. `/sys/fs/cgroup/memory`, `/cpu`, etc.). You create a subdirectory and write to files like `memory.limit_in_bytes`, `cpu.shares`, etc.  
-- **v2:** A unified hierarchy (`/sys/fs/cgroup/unified`) with simpler interfaces (`memory.max`, `cpu.max`, etc.) and optional distribution of resources.  
-
-For example, to limit a container to 50 MB RAM and half of a CPU core (in v2) one might do:  
-```bash
-sudo mount -t cgroup2 none /sys/fs/cgroup
-sudo mkdir /sys/fs/cgroup/mycontainer
-echo "50000 100000" > /sys/fs/cgroup/mycontainer/cpu.max
-echo 50000000 > /sys/fs/cgroup/mycontainer/memory.max
-echo <PID> > /sys/fs/cgroup/mycontainer/cgroup.procs
-```  
-This creates a cgroup at `/sys/fs/cgroup/mycontainer`, sets CPU max to 50-100%, memory max to 50,000,000 bytes, and adds the process ID of interest to it. The process (and its children) will then be limited accordingly. Cgroups are key to preventing a runaway container from exhausting host resources.
-
- *Figure: Allocating resources to a cgroup (blue) limits its share of CPU, memory, etc., leaving the remainder to other groups/processes.*  
-
-# Preparing a Minimal Root Filesystem  
-A container needs its own root filesystem (an isolated `/`). A lightweight approach is to use a **“minirootfs”** from a small distro like Alpine Linux. For example, one can download Alpine’s minirootfs tarball and extract it:
-```bash
-sudo mkdir -p /container
-cd /container
-sudo wget https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.4-x86_64.tar.gz
-sudo tar -xzf alpine-minirootfs-3.18.4-x86_64.tar.gz -C .
-```
-This creates a folder (e.g. `/container/rootfs`) containing the minimal files (bin/, lib/, etc.) needed for Alpine. Inside that, standard directories `/bin`, `/lib`, `/usr`, etc. will exist. 
-
-Once the rootfs is in place, we typically mount a few pseudo-filesystems inside it so that the container can function:
-- Mount a new `proc` (unless using `--mount-proc`): `sudo mount -t proc proc /container/rootfs/proc`  
-- Mount `sysfs`: `sudo mount -t sysfs sys /container/rootfs/sys`  
-- Mount device nodes: either bind-mount `/dev` or use devtmpfs:  
+- **PID namespace (`CLONE_NEWPID`)**: Gives the container its own process ID space. The first process (the “init” in that container) is PID 1. Other processes in the container have PIDs starting from 2, etc., unrelated to host PIDs. For example, running 
   ```bash
-  sudo mount --bind /dev /container/rootfs/dev
-  sudo mount -t devpts devpts /container/rootfs/dev/pts
+  unshare --fork --pid --mount-proc readlink /proc/self
   ```
-- (Optional) mount a `tmpfs` on `/container/rootfs/tmp` if needed: `sudo mount -t tmpfs tmpfs /container/rootfs/tmp`.  
+  shows “1”, indicating the new shell is PID 1 in its namespace.
 
-These mounts ensure that `/proc`, `/sys`, `/dev`, and other essential parts are available inside the container. Without them, many tools (even `ps`, `mount`, etc.) will not work correctly inside the chroot.
+- **UTS namespace (`CLONE_NEWUTS`)**: Isolates the hostname and NIS domain. You can set a container-specific hostname (`hostname ...`) without changing the host’s name.
 
-# Step-by-Step: Creating a Container with `unshare` + `chroot`  
-With the rootfs ready and mounts in place, we can now **unshare namespaces and chroot** into the container. For example, to create a shell inside an isolated namespace environment:
-```bash
-sudo unshare --mount --uts --ipc --pid --net --fork --mount-proc chroot /container/rootfs /bin/sh
-```
-Let’s break down the flags:  
-- `--mount` (new mount namespace) – so mounts done inside won’t affect host.  
-- `--uts` (new UTS namespace) – gives a separate hostname/domain.  
-- `--ipc` (new IPC namespace) – isolates SysV/POSIX IPC.  
-- `--pid` (new PID namespace) – isolates process IDs, so that the shell inside gets PID 1 (like init) and can’t see host processes.  
-- `--net` (new network namespace) – separates the network stack (we will attach veths to it next).  
-- `--fork` – runs the following in a child process, so that PID 1 ends up being our shell.  
-- `--mount-proc` – automatically mounts a new `/proc` for the new PID namespace (this implies `--mount`).  
-- `chroot /container/rootfs` – changes the root directory to the new rootfs.  
-- `/bin/sh` – the command to run inside (the shell).  
+- **IPC namespace (`CLONE_NEWIPC`)**: Separates System V IPC (message queues, semaphores) and POSIX message queues. Processes in one namespace do not see the IPC objects of another.
 
-After running this, you should get a shell whose prompt might show you’re “root”. Inside this shell, you are in an **isolated container environment**: a new PID 1, a blank hostname, a /proc showing only the shell itself, etc.  For example, inside you might see only two processes (`sh` and `ps` if you run it), whereas on the host there are many more. In other words, this is like a tiny Linux system.
+- **Network namespace (`CLONE_NEWNET`)**: Gives each container its own network stack. Inside, the container sees its own interfaces, IP addresses, routing tables, firewall rules, etc., and does not see the host’s interfaces (other than the loopback). For example, an empty new net namespace starts with only `lo` (loopback) interface and no access outside.
 
-# Setting Hostname and Host Identity  
-Inside the new shell, set a hostname so the container identity is clear:
-```bash
-hostname container1
-```
-This changes the container’s hostname (visible via `uname -n`). It does not affect the host because we unshared UTS.  
+- **User namespace (`CLONE_NEWUSER`)**: Allows UID/GID remapping. Inside the container’s user namespace, a process can have UID 0 (root) while being unprivileged on the host. The kernel quotes explain: “The process will have a distinct set of UIDs, GIDs and capabilities”. Typically one uses `--map-root-user` or related `unshare` options so that the invoking user maps to root inside the container. This enables creation of device files or mounts inside the container without host privileges.
 
-At this point, you have a minimal container shell. You can try simple commands (`whoami` should say root; `ps -ef` should show very few processes). Note that the container’s root user is actually the real root (we did `sudo unshare`), so be careful: this is a privileged container. If you had used `--user --map-root-user`, you could achieve a **rootless container** where root inside is non-root outside, but that’s another topic.
+- **Cgroup namespace (`CLONE_NEWCGROUP`)**: (for completeness) virtualizes the view of the cgroup filesystem (shows only the container’s cgroup subtree).
 
-# Adding Networking: veth Pairs, Bridge, and NAT  
-By default, the new network namespace has no external connectivity (only a loopback). To connect it, we create a **veth pair** on the host and plug one end into the container’s namespace. For example, in another terminal on the **host** (not inside the container) do:
+- (Other namespaces like time namespaces exist, but are beyond our focus.)
 
-```bash
-# Suppose CONTAINER_PID is the PID of the shell in the container (the host sees it).
-CONTAINER_PID=$(pgrep -fu root /bin/sh)
-
-# 1) Create veth pair: one end veth-host, the other veth-cont.
-sudo ip link add veth-host type veth peer name veth-cont
-
-# 2) Move the container end into the container's netns.
-sudo ip link set veth-cont netns $CONTAINER_PID
-
-# 3) On the host: attach veth-host to a bridge (or use docker0).
-sudo ip link set veth-host master br0  # assuming br0 exists
-
-# 4) Bring up the host side.
-sudo ip link set veth-host up
-
-# 5) Assign IP to host-side veth (on the bridge network).
-sudo ip addr add 192.168.56.1/24 dev veth-host
-```
-
-Then, inside the container shell:
-
-```bash
-# Inside container namespace (sudo was on host to enter netns):
-ip addr add 192.168.56.2/24 dev veth-cont
-ip link set veth-cont up
-ip link set lo up
-```
-
-This gives the host a “bridge” IP 192.168.56.1 and the container a 192.168.56.2. Now the container can ping the host’s veth (and vice versa). To allow the container to reach the outside internet, the host can set up NAT (iptable MASQUERADE) on its physical NIC. For example on the host:
-
-```bash
-sudo iptables -t nat -A POSTROUTING -s 192.168.56.0/24 -o eth0 -j MASQUERADE
-```
-
-Now containers’ outbound traffic will appear from the host’s IP.  The diagram below illustrates a typical setup:
-
- *Figure: Docker’s default bridge network uses a Linux bridge (`docker0`, green) to connect each container’s virtual Ethernet interface (`eth0`) to the host. Each container’s `eth0` is one end of a veth pair; the other end (e.g. `vethXYZ`) sits on the bridge. The bridge routes container-to-container traffic and NATs outgoing traffic via the host.*  
-
-With networking in place, the container can ping external IPs (e.g., `ping 8.8.8.8`) and other containers on the same bridge. You can modify firewall rules or use tools like `ip netns exec` to further manage connectivity.
-
-# Applying cgroup Limits to the Container  
-To control resources, we assign the container’s processes to a cgroup and set limits. Suppose we want to restrict this container to 50 MB RAM and limit CPU. On the **host**, after mounting cgroup2 (if not already):
-
-```bash
-sudo mount -t cgroup2 none /sys/fs/cgroup
-sudo mkdir /sys/fs/cgroup/container
-echo "50000 100000" | sudo tee /sys/fs/cgroup/container/cpu.max   # 50% - 100%
-echo 50000000 | sudo tee /sys/fs/cgroup/container/memory.max       # 50 MB
-# Add the container's PID (from host perspective) to the cgroup
-echo $CONTAINER_PID | sudo tee /sys/fs/cgroup/container/cgroup.procs
-```
-
-Now any process in that namespace (our shell, and processes it spawns) is limited. You can verify usage via `/sys/fs/cgroup/container/*`.
-
-# Automating Container Startup (Example Script)  
-You could wrap the above steps in a shell script (a tiny runtime). For example (simplified):
-
-```bash
-#!/bin/bash
-# 1. Prepare rootfs, mounts (if not done already)
-sudo mkdir -p /container/rootfs && cd /container
-sudo wget ...alpine-minirootfs-*.tar.gz
-sudo tar -xzf alpine-minirootfs-*.tar.gz -C rootfs
-sudo mount --bind /dev rootfs/dev
-sudo mount -t devpts devpts rootfs/dev/pts
-sudo mount --bind /sys rootfs/sys
-
-# 2. Launch container process with new namespaces
-sudo unshare --mount --uts --ipc --pid --net --fork --mount-proc \
-    chroot rootfs /bin/sh -c "
-  hostname ctr1
-  exec /bin/sh
-"
-```
-
-This script (when run) leaves you in a shell inside the new container (with hostname set). One could extend it to set up networking and cgroups automatically. In practice, container runtimes (e.g. runc, Docker) perform these steps programmatically.
-
-# Security Considerations and Mitigations  
-A homemade container has no additional security mechanisms beyond what Linux provides natively. Some considerations:  
-
-- **Privileged vs Unprivileged:** The above example uses `sudo unshare`, so the container’s root is actually host root. If a process in the container escapes (e.g. via a kernel exploit), it has full host privileges. To mitigate this, use a **user namespace** so that container UID 0 maps to a non-root host UID. In a user-ns, even if “root” in the container gets out, the kernel treats it as an unprivileged user on the host (e.g. UID 100000), limiting damage.  
-- **chroot breaks:** A root user can break out of a chroot jail.  Real container runtimes do a `pivot_root` + remounts which are slightly harder to escape from, but kernel vulnerabilities could still break out if root.  
-- **No seccomp by default:** Our simple container has no syscall filtering; a real container runtime often uses seccomp or other Linux security modules (AppArmor, SELinux) to restrict syscalls. Without these, the container can use all syscalls that root normally can.  
-- **Shared kernel:** All containers share the host kernel. Any kernel bug (especially in namespaces or cgroups) could compromise all containers and the host. Traditional VMs avoid this by running a separate kernel.  
-- **Network attacks:** If the bridge and firewall aren’t configured properly, containers might see host network services or interfere with other containers. Always configure network policies carefully (e.g. using network namespaces and proper IP routing).  
-- **User namespace mapping:** If using user namespaces, note that some privileged operations (like mounting certain filesystems) may be restricted unless properly configured.  
-
-Mitigations include running containers with reduced capabilities (e.g. drop `CAP_SYS_ADMIN` inside), using seccomp filters, chroots in mount namespaces, etc. (These are beyond the scope of this guide.) In all cases, remember: a DIY container is not a perfect sandbox. Container runtimes like Docker include additional layers (user namespaces, AppArmor/SELinux profiles, rootless modes, etc.) to harden the environment.
-
-# Comparison: DIY Unshare Container vs Docker/Podman (Containerd)  
-| Feature / Aspect             | DIY (`unshare`+`chroot`)             | Docker/Podman (containerd/runc)       |
-|:-----------------------------|:-------------------------------------|:--------------------------------------|
-| **Isolation setup**         | Manually select namespaces to unshare (mount, pid, net, ipc, uts, possibly user). Requires root (or userns) to unshare. | Automatically creates all necessary namespaces. Rootless mode uses userns. |
-| **Rootfs (filesystem)**     | Use any rootfs (e.g. Alpine minirootfs) manually extracted. No layering or snapshots by default. | Uses **images** (read-only layers + overlayfs). Pull from registry; writable layer is auto-mounted. |
-| **Commands**                | Uses standard Linux tools (`unshare`, `chroot`, `ip`, `mount`, etc.). | High-level CLI (`docker run`). Underneath: containerd & runc do `unshare()`, `mount`, `pivot_root`, `setns` etc. automatically. |
-| **Networking**              | Must manually create veth pairs, bridges, and configure iptables for NAT. | By default, Docker creates a bridge network (`docker0`) and sets up veths and NAT automatically. Simplifies networking for user. |
-| **Resource limits (cgroups)** | Manually configure cgroup filesystems and set limits. | Flags (`--memory`, `--cpus`, etc.) automatically configure cgroups under the hood. |
-| **Security features**       | No built-in seccomp or dropped capabilities (unless you do it yourself). | Runtimes use default seccomp profiles, AppArmor/SELinux labels, and can run containers with fewer capabilities. |
-| **Portability**             | Not portable: the container is tied to the host environment (no easy packaging). | Containers are portable artifacts (images) that can run on any compatible host with Docker/OCI runtime. |
-| **Ease of use**             | Educational but low-level and manual. Good for learning, bad for production use. | Very user-friendly: one `docker run` command can start complex containers. |
-| **Features & ecosystem**    | Barebones: you only get exactly what you script (no volume management, no service discovery, etc.). | Rich ecosystem: images, registries, orchestration (Kubernetes), plugins, etc. |
-| **Isolation scope**         | Exactly what you choose via namespaces/cgroups. If you forget something (e.g. userns), isolation may be weaker. | Follows OCI standards: by default isolates PID, net, IPC, UTS, mount, userns (if enabled), plus seccomp. |
-| **Performance**             | Similar runtime overhead (same kernel), but no image caching/overhead. | Similar (shares kernel). Some overhead for overlayfs layers, but negligible in practice. |
-
-Modern container tools essentially automate all the manual `unshare` and mount steps described above, making containers much easier to run. For example, when Docker’s CLI is used, it performs these steps in the background. However, understanding the manual process is invaluable for grasping what actually happens inside a container.
-
-# Troubleshooting Common Issues  
-- **“Operation not permitted” with `unshare` or `mount`:** Make sure you have the necessary capabilities. Typically you need to be root (CAP_SYS_ADMIN) to create most namespaces and mount new filesystems. Without a user namespace, only root can `unshare` namespaces.  
-- **“chroot: failed to run command: No such file or directory”:** Inside `rootfs`, `/bin/sh` or the specified command must exist and be executable. Also verify you have mounted required libraries (e.g. via `ldd`) in the rootfs.  
-- **No `/proc` inside container:** If you forgot `--mount-proc` or mounting proc manually, tools like `ps` will not work. Inside the container shell try `mount -t proc proc /proc`.  
-- **Network unreachable:** Check that the veth link is up on both host and container side (`ip link`). Ensure IP addresses and netmask are correct and that the bridge (e.g. `br0`) has the host’s veth attached. Also check your iptables NAT rules if using NAT.  
-- **Rootless containers (`--user`):** If unsharing user namespace, mapping root, you may not see contents on host or have permission to bind-mount `/dev`, etc. Use `--map-root-user` or configure `/etc/subuid,/etc/subgid`.  
-- **Cgroup mounting errors:** On some systems (like WSL2), you may need to enable cgroup v2 or mount it manually as shown. If `/sys/fs/cgroup` isn’t present, create it and mount.  
-- **Processes suddenly exit:** Remember in a PID namespace, if PID 1 exits, all processes in that namespace are killed. Ensure your container’s init (PID 1) stays alive or explicitly runs your main service.  
-- **Stuck in container shell:** If you run `unshare` without `--fork`, your shell might not start as PID 1 properly. Use `--fork` or explicitly run a nested shell with `exec`.  
-
-In general, carefully check the kernel logs (dmesg) and error messages. Also compare `/proc/self/status` and `/proc/self/ns/` on host vs container to see what namespaces are active.
-
-# Container Runtime Flow (Mermaid Diagram)  
-Below is a high-level flowchart of what a container runtime does (similar to our manual steps):
+Each namespace can be created with `unshare` (or clone with flags). For example, `unshare -m -p -u -i -n` creates new mount, PID, UTS, IPC, and net namespaces. The man page `unshare(1)` has many examples of using these flags.
 
 ```mermaid
-flowchart TD
-    A[Prepare rootfs (e.g. extract Alpine)] --> B[Create namespaces (unshare)]
-    B --> C[Mount /proc, /sys, /dev inside new mount ns]
-    C --> D[Set hostname and other ns settings]
-    D --> E[Configure network (veth pair, bridge, ip)]
-    E --> F[Apply cgroup limits (CPU, memory, etc.)]
-    F --> G[Exec container’s PID 1 process (chroot and exec)]
+flowchart LR
+    Host((Host Namespaces))
+    Ctn((Container Namespaces))
+    Host -->|mount ns| Ctn
+    Host -->|pid ns| Ctn
+    Host -->|net ns| Ctn
+    Host -->|uts ns| Ctn
+    Host -->|ipc ns| Ctn
+    Host -->|user ns| Ctn
+```  
+*Diagram: Conceptual view of host vs container namespaces. Each arrow indicates that the container has a separate (isolated) namespace of that type.*
+
+### Difference from `chroot(2)`:
+
+It is important to note that **`chroot` by itself is not containerization**. The `chroot(2)` call “changes an ingredient in the pathname resolution” (the root directory) but “does nothing else” for isolation. A process inside a `chroot` can still see all host processes, network, and even, under some circumstances, break out of the jail (by `chdir("..")` tricks as the manpage warns). In contrast, real containers use namespaces *in addition to* a changed root to isolate all aspects of execution. As one security review notes, `chroot` *“was never intended as a security device”* and is easily escaped. In our setup we use `chroot` only to change the filesystem root, combined with separate namespaces to achieve full isolation.
+
+### Example – Unshare with `--mount-proc`:
+
+A common sequence is `unshare --fork --pid --mount-proc ...`. The `--mount-proc` option is very useful when creating a new PID namespace: it “mount[s] the proc filesystem at [the new] /proc” and *automatically* creates a new mount namespace first, so the new `/proc` only shows the new PID namespace processes. For example, the command:
+
+```bash
+unshare --fork --pid --mount-proc readlink /proc/self
 ```
 
-# Conclusion  
-Using `unshare`, `chroot`, and cgroups you can build a native Linux container from scratch. This exercise demystifies how container runtimes like Docker actually work under the hood. The core idea is simple: “**change what the process can see, then control what it can use**.”  Everything else (images, overlays, registries) is user-space tooling to make this convenient. By following the steps above, you will have a minimal containerized environment on Linux, gaining insight into namespaces, `/proc`, networking via veth/bridges, and cgroups.  
+forks a new child in a new PID namespace and mounts /proc for it. The `readlink /proc/self` then outputs `1`, showing that inside this new namespace the process itself is PID 1. (Without `--mount-proc`, `/proc` in a new PID namespace would still show the host’s processes and confuse Linux.)
 
-**Sources:** Official Linux documentation and tutorials have been used wherever possible. The concepts and commands above are based on kernel behavior (man-pages and kernel docs), as well as high-quality community tutorials.  This guide assumes a modern Linux (kernel ≥4.8, root privileges) on x86_64; adjust versions (e.g. Alpine release) as needed.    
+## The Role of `/proc` and `--mount-proc`
+
+The `/proc` filesystem is a virtual interface to kernel data. In container setup, after entering a new PID namespace, you generally need a fresh `/proc` in that namespace. The `unshare --mount-proc` option does this automatically (mounting a new procfs in the new namespace). If you do not use it, you must manually run something like `mount -t proc proc /proc` after chrooting. Without a proper /proc, tools like `ps` will show host processes or fail. Similarly, you often mount `/sys` (`mount -t sysfs sys /sys`) and devfs (`mount -o bind /dev /container/dev`) inside the container for a complete environment. We will do that in the step-by-step section below.
+
+## Cgroups: Resource Control Basics
+
+Linux **cgroups** (control groups) let you limit and monitor resource usage (CPU, memory, I/O, etc.) for a group of processes. Modern systems use cgroup v2 (unified hierarchy) by default. In essence, you mount the cgroup filesystem (typically on `/sys/fs/cgroup`), create a child directory, and write to files to set limits.
+
+For example, after `mount -t cgroup2 none /sys/fs/cgroup`, one might do:
+```bash
+mkdir /sys/fs/cgroup/mygroup
+# Enable CPU and memory controllers (optional, if not already root’s default)
+echo "+cpu +memory" > /sys/fs/cgroup/mygroup/cgroup.subtree_control
+
+# Limit CPU: echo "max period" to cpu.max. E.g. 200000/1000000 -> 0.2s per 1s (20% CPU)
+echo "200000 1000000" > /sys/fs/cgroup/mygroup/cpu.max   # limit to 0.2s CPU per sec
+
+# Limit memory: echo bytes (or M suffix) to memory.max. E.g. 500M hard limit.
+echo "500M" > /sys/fs/cgroup/mygroup/memory.max          # 500 MB RAM limit
+```
+The kernel-doc example explains that writing “200000 1000000” to `cpu.max` means 0.2s of CPU time per second (20%). Similarly, echoing a value to `memory.max` sets a hard memory limit. You then add processes (by PID) to this cgroup via `echo $PID > /sys/fs/cgroup/mygroup/cgroup.procs`. Tools like `cgexec` can also place commands into cgroups.
+
+In practice, containers often run in their own cgroup (or subtree) so the host can limit how much memory/CPU the container uses. Even without cgroups, each container process runs in a namespace-isolated environment, but the host system resources remain shared unless explicitly limited.
+
+## Setting Up an Alpine Mini Root Filesystem
+
+We use Alpine Linux’s “mini root filesystem” as our container’s OS root. Alpine provides tarballs of a minimal rootfs under its downloads page. For x86_64, download the “Mini root filesystem” (for example, via the link marked “x86_64” on the Alpine download page). Then on the host:
+
+```bash
+mkdir /var/containers/alpine
+tar -xzf alpine-minirootfs-*.tar.gz -C /var/containers/alpine
+```
+
+This creates a minimal Alpine installation in `/var/containers/alpine`. (Alternatively, one can use `apk.static --initdb add alpine-base` as documented by Alpine’s wiki, but the tarball is simpler.) Inside this directory we have `/bin`, `/lib`, `/etc/os-release`, etc., just like a small Alpine machine.
+
+Before `chroot`ing into it, populate its `/dev`: e.g.:
+
+```bash
+mount -o bind /dev /var/containers/alpine/dev
+mount -o bind /dev/pts /var/containers/alpine/dev/pts
+```
+
+These bind-mounts make host devices (like console, random, etc.) appear in the container. Alternatively one could create device nodes manually (as Alpine docs show), but bind-mount is easiest if running as root. Now `/var/containers/alpine/dev` is ready.
+
+## Creating the Container: `unshare` + `chroot`
+
+With the rootfs ready, we start a container by unsharing namespaces and chrooting into that new root. For example:
+
+```bash
+unshare --fork --pid --net --ipc --uts --mount --user --map-root-user --mount-proc chroot /var/containers/alpine /bin/ash
+```
+
+Breakdown of the flags:
+- `--pid --fork --mount-proc`: new PID namespace (pid 1 inside), and mount /proc for it.
+- `--net`: new network namespace.
+- `--uts`: new UTS (hostname) namespace.
+- `--ipc`: new IPC namespace.
+- `--mount`: new mount namespace (to isolate mounts).
+- `--user --map-root-user`: new user namespace, mapping our user to root inside.
+- `chroot /var/containers/alpine /bin/ash`: change root and execute a shell (`ash` is Alpine’s BusyBox shell).
+
+Inside this new shell (PID 1 in its namespace), the process has `uid=0` (root) in the container, but the host user is unprivileged. The `/proc` we see is the fresh one due to `--mount-proc`. We now have an interactive Alpine environment isolated from the host by namespaces.
+
+## Setting Up Networking (veth + Bridge)
+
+By default the new network namespace only has the loopback interface (`lo`) and no connection to the outside. To give it connectivity, we create a virtual Ethernet pair (`veth`) on the host and move one end into the container’s namespace. For example, on the host:
+
+```bash
+# Suppose CPID is the PID of the ash shell in the container (namespace’s init)
+ip link add veth-host type veth peer name veth-cont
+ip link set veth-cont netns $CPID
+ip link set veth-host up
+```
+
+This creates `veth-host` on the host and `veth-cont` inside the container (because of the `netns $CPID` move). We then assign IP addresses:
+
+```bash
+ip addr add 10.0.3.1/24 dev veth-host
+ip netns exec $CPID ip addr add 10.0.3.2/24 dev veth-cont
+ip netns exec $CPID ip link set veth-cont up
+```
+
+Now inside the container you can `ip link set lo up` and `ip link set veth-cont up`, and `ip addr` shows `eth0` (after renaming from veth) and `lo`. This matches examples found in tutorials, e.g. creating veth pairs and assigning 10.0.3.1/24 and 10.0.3.2/24.
+
+Optionally, connect the host end to a bridge so multiple containers can share a virtual LAN. For example:
+
+```bash
+ip link add br0 type bridge
+ip link set veth-host master br0
+ip addr add 10.0.3.1/24 dev br0
+ip link set br0 up
+```
+
+This creates `br0` and enslaves `veth-host` into it. Any other container’s veth (similarly added) could also be added to `br0`. The bridge can be given the gateway IP (10.0.3.1 in this example) and used by containers as their default route. In the container: `ip route add default via 10.0.3.1`. This setup is analogous to Docker’s default bridge network. The concepts and commands are documented in blogs and network docs.
+
+Finally, if the containers need Internet access, enable IP forwarding on the host (`echo 1 > /proc/sys/net/ipv4/ip_forward`) and add a NAT (masquerade) rule on the host’s external interface. For instance:
+
+```bash
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+
+This makes outgoing container traffic appear as coming from the host’s IP, and replies are routed back. Now a container can ping external addresses through the host.
+
+## Mounting `/proc`, `/sys`, and `/dev` in the Container
+
+Inside the container shell (post-`chroot`), we ensure necessary pseudo-filesystems are mounted:
+
+```bash
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs udev /dev    # or bind /dev from host as shown earlier
+mount -t devpts devpts /dev/pts
+```
+
+- `/proc` provides process and namespace info. With a new PID namespace, the content of `/proc` reflects only the container’s processes. 
+- `/sys` (sysfs) is often needed by tools like `udevadm`. 
+- `/dev` should have device nodes (from the earlier bind-mount or devtmpfs) so commands like `mknod`, `mount -o bind`, or `apk` can access devices. 
+
+If using `--mount-proc` with `unshare`, the `/proc` mount might already be in place. In our example we mounted `--mount-proc` *before* `chroot`, which automatically mounted a private `/proc`. Other mounts we do manually inside the chroot.
+
+## Setting Hostname and UID Mapping
+
+With UTS and User namespaces, we can now set container-specific identity:
+
+- **Hostname:** Inside the container, do `hostname alpine-container`. This affects only the container’s UTS namespace (as isolated by `--uts`) and leaves the host’s hostname unchanged.
+- **UID/GID mapping:** Because we used `--map-root-user` (or `--map-users=auto --map-groups=auto`), our user is root (UID 0) inside. If running as a non-root user, you must ensure `/etc/subuid` and `/etc/subgid` on the host allow the mapping. (In practice one adds a line like `youruser:100000:65536` to `/etc/subuid`/`/etc/subgid` to allocate a range. Without this, unprivileged `unshare` will fail to set up the user namespace.)
+
+Example from documentation: using `--map-root-user`, the container shell runs as UID 0 inside, but actually maps back to the host user ID outside. This gives the container the privileges needed to, for example, add network interfaces or mount filesystems inside its namespace. Without user namespaces, you would have to be real root on the host to do these steps.
+
+## Automating with Scripts
+
+One can automate these steps in a shell script. For example:
+
+```bash
+#!/bin/sh
+ROOTFS=/var/containers/alpine
+# Create container
+unshare --fork --pid --net --ipc --uts --mount --user --map-root-user --mount-proc \
+    chroot "$ROOTFS" /bin/ash << 'END'
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs udev /dev
+mount -t devpts devpts /dev/pts
+ip link set lo up
+ip addr add 172.19.35.2/24 dev eth0  # example static IP
+ip link set eth0 up
+hostname native-container
+exec /bin/ash
+END
+```
+
+This script enters the Alpine `ash` shell and executes the block to set up mounts, IP, etc. In practice, one might separate host and container commands; the above uses a heredoc inside the `chroot` to illustrate both host and in-container steps. Real scripts might capture the container PID and run host commands (like creating veth) after launching the shell.
+
+## Verification Inside the Container
+
+Once the container shell is up, verify the setup:
+
+- **OS Release:** `cat /etc/os-release` should show Alpine Linux, confirming the rootfs is Alpine.
+- **Process list:** `ps aux` should show only processes inside the container. The shell will be PID 1. Host processes (other than veth listener, etc.) will not appear.
+- **Network interfaces:** `ip addr` (or `ip a`) should show `lo` and the new `eth0` (or veth) interface with the assigned IP, but not the host’s other interfaces. 
+- **Cgroup membership:** `cat /proc/self/cgroup` will show the container’s cgroup path (if you set one up). If you run `echo $$ > /sys/fs/cgroup/mygroup/cgroup.procs` for example, then `cat /proc/$$/cgroup` will reflect `/mygroup` (for v2).
+
+These steps ensure the container is indeed isolated: its `/proc` shows only container PIDs, its network namespace is separate (loopback + veth), and it has its own root filesystem.
+
+## Common Pitfalls and Troubleshooting
+
+- **Must run as root or with userns mapping.** Creating most namespaces (PID, mount, net, etc.) requires CAP_SYS_ADMIN. If not root, you must use a user namespace to elevate privileges inside (as we did with `--user --map-root-user`). On recent kernels, `--user` alone still requires you have subordinate UID mappings in `/etc/subuid` and `/etc/subgid` to work. Otherwise `unshare` will fail to set up.
+- **`/proc` missing or wrong.** If you forget `--mount-proc` or a manual `mount -t proc`, you may see host processes or get errors when using commands like `ps`. Always mount `/proc` after entering a PID namespace.
+- **Network unreachable.** After setting up veth and bridge, ensure you brought up interfaces (`ip link set up`) on both host and container sides, and set the default route/gateway correctly. Also enable IP forwarding and MASQUERADE if reaching outside. Missing `ip link set lo up` is a common cause of “Network is unreachable” on `ping localhost`.
+- **Cgroups not mounted or enabled.** By default on many systems cgroup v2 is auto-mounted at `/sys/fs/cgroup`. If it’s not, you may need to `mount -t cgroup2 none /sys/fs/cgroup`. Also ensure the controllers (like cpu, memory) are enabled in `cgroup.subtree_control`.
+- **`chroot` breaks if missing libraries.** The Alpine rootfs is minimal; if your unshare command or shell isn’t in there, chroot will fail. We used `/bin/ash` which is in the Alpine base. If you use a different binary, copy it or its libraries into the rootfs first.
+- **File permissions.** Inside the container, file ownership is remapped by userns. A file created as root in-container may appear as UID 100000+ on host, for example (see [40]). This can confuse builds or tools. Plan for UID mapping or add `--map-users` if needed.
+- **Service processes.** PID 1 in a namespace behaves like init: if it exits, the container’s processes will die. Be careful how you spawn the shell/process (e.g. using `--fork`) so that you do not inadvertently kill your container’s main process.
+
+When troubleshooting, tools like `lsns`, `ip netns`, `ip a`, and looking at `/proc/[pid]/ns/` symlinks can confirm which namespaces your process is in.
+
+## Security Considerations
+
+While namespaces provide isolation, *container security is not absolute*. For example, in our container you are still “root” in the sense of container permissions, so you can (if not dropped) change the system clock, reboot the machine, or load kernel modules – all within your namespace. A blog warns that even with `unshare`, “you are limited but you are still pretty powerful”. To mitigate this, containers usually drop many Linux capabilities (e.g. with `capsh` or Docker’s default seccomp/cap drops) and use cgroups to prevent resource exhaustion. We did not cover those in detail here, but be aware that `unshare/chroot` alone does not sandbox things like the kernel (no virtualization) – it simply limits what you see. In contrast, tools like Docker add seccomp filters, AppArmor/SELinux profiles, and a daemon that runs as root (which has its own security implications). Always run containers with least privilege and be cautious if running untrusted code.
+
+Another point: Because we used `--map-root-user`, processes inside see themselves as root (UID 0) which is convenient for setup. But kernel vulnerabilities or misconfigurations could allow escaping even from a namespaced container. In practice, containers rely on correct kernel behavior and additional security layers (not shown here).
+
+## Feature Comparison: chroot vs Linux-namespaced Container vs Docker
+
+| Feature / Isolation        | `chroot` only    | Namespaced Container (DIY)        | Docker/Containerd                    |
+|----------------------------|------------------|-----------------------------------|--------------------------------------|
+| **Filesystem root**        | Yes (via chroot) | Yes (via chroot/pivot_root inside new mount ns) | Yes (image-based, new mount ns) |
+| **Process (PID) isolation**   | No – sees all PIDs     | Yes (new PID ns; first PID=1 in container) | Yes (same as DIY container)  |
+| **Network isolation**      | No – sees host interfaces | Yes (new net ns, separate interfaces) | Yes (per-container net ns, e.g. docker0 bridge) |
+| **UTS/Hostname isolation** | No – shared with host  | Yes (new UTS ns) | Yes (per-container hostname) |
+| **IPC isolation**          | No – sees host IPC     | Yes (new IPC ns) | Yes |
+| **User/UID isolation**     | No – same UID space    | Optional (with user ns) | Yes (sets root inside but can run unprivileged) |
+| **Resource limits (cgroups)**  | No – shared limits | Optional (must mount/apply manually) | Yes (Docker applies cgroups for memory/CPU by default) |
+| **Root privileges needed?**| Yes (must be root)    | Yes (for unshare or need userns config) | Docker daemon runs as root (but runtime can be rootless) |
+| **Security**               | Very limited (easy escape) | Better (isolates many vectors) but still shares kernel | Adds more protections (cap drops, seccomp) but daemon is privileged |
+| **Ease of use / Tooling**  | Manual (low-level)   | DIY scripts/commands       | High (images, pull/push, volume mgmt, ecosystem) |
+| **Example scope**         | Legacy jails, software builds | Custom containers, CI tasks  | Production deployment of microservices |
+
+This table summarizes how a plain `chroot` compares to a home-grown container and to Docker (which under the hood also uses namespaces/cgroups). Key point: **chroot alone is not real isolation**. Using all namespaces (a “namespace container”) achieves most isolation, and adding cgroups gives resource control. Docker and containerd build on these fundamentals but add tooling, image layers, and often extra security measures.
+
+## Mermaid Diagrams
+
+**Namespace relationships (Host vs Container):**
+```mermaid
+flowchart LR
+    HMount(Mount NS: host) -- isolated --> CMount(Mount NS: container)
+    HPID(PID NS: host) -- isolated --> CPID(PID NS: container)
+    HNet(Net NS: host) -- isolated --> CNet(Net NS: container)
+    HUTS(UTS NS: host) -- isolated --> CUTS(UTS NS: container)
+    HIPC(IPC NS: host) -- isolated --> CIPC(IPC NS: container)
+    HUser(User NS: host) -- isolated --> CUser(User NS: container)
+```
+This diagram illustrates that each namespace type in the container is separate from the host’s (i.e. isolated). The arrows indicate that the container has its own copy of each namespace.
+
+**Container creation flowchart:**
+```mermaid
+flowchart LR
+    A[Start on Host] --> B[Download Alpine mini-rootfs]
+    B --> C[Extract Alpine rootfs to /var/containers/alpine]
+    C --> D[Create /dev nodes or bind mount /dev]
+    D --> E[Run `unshare` with PID, mount, net, uts, ipc, user namespaces]
+    E --> F[`chroot /var/containers/alpine /bin/ash` (Alpine shell)]
+    F --> G[Inside container: mount /proc, /sys, set hostname]
+    G --> H[On Host: create veth pair and bridge]
+    H --> I[Configure IP addresses, `ip route`, iptables NAT]
+    I --> J[Container ready: isolated shell (PID1), verify with `ps`, `ip addr`, etc.]
+```
+This flowchart outlines the runtime steps from preparing the Alpine rootfs, to using `unshare+chroot` to enter it, and setting up networking and mounts. Each step is detailed in the sections above.
+
+**Sources:** Official Linux man pages and kernel documentation were used (e.g. `unshare(1)`, `cgroups(7)`, `chroot(2)`), along with Alpine Linux guides and authoritative tutorials. These citations above link to the relevant authoritative sections. Any unspecified details (e.g. host distribution, IP ranges) can be adjusted to the user’s environment. 
+
