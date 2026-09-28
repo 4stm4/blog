@@ -752,6 +752,8 @@ a:hover { color: var(--secondary); }
 
 .img-wrap {
   display: block;
+  width: fit-content;
+  max-width: 100%;
   position: relative;
   margin: 10px 0;
   background: rgba(208, 188, 255, 0.03);
